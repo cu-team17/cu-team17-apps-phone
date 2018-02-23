@@ -22,16 +22,42 @@ public class MainActivity extends AppCompatActivity {
 			establishPermissions();
 			//ToDo: start bluetooth
 		}
-		//MessageService.startActionFoo(getApplicationContext(), "no", "noo");
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 		switch (requestCode) {
 			case REQUEST_CODE_PERMISSIONS_LIST: {
-				//ToDo: check each permission result
+				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
+					permissionResult(permissions[i],grantResults[i]);
+				}
 
+			}
+		}
+	}
 
+	private void permissionResult(String permission, int grantResult) {
+		switch (permission) {
+			case Manifest.permission.RECEIVE_SMS: {
+				if (grantResult == PackageManager.PERMISSION_GRANTED) {
+					//ToDo: messaging permission granted
+				} else {
+					//ToDo: no messaging permission
+				}
+			}
+			case Manifest.permission.READ_PHONE_STATE: {
+				if (grantResult == PackageManager.PERMISSION_GRANTED) {
+					//ToDo: phone permission granted
+				} else {
+					//ToDo: no phone permission
+				}
+			}
+			case Manifest.permission.READ_CONTACTS: {
+				if (grantResult == PackageManager.PERMISSION_GRANTED) {
+					//ToDo: contacts permission granted
+				} else {
+					//ToDo: no contacts permission
+				}
 			}
 		}
 	}

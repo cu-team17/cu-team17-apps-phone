@@ -29,12 +29,6 @@
             </intent-filter>
         </activity>
 
-
-        <service
-            android:name=".MessageService"
-            android:exported="false"/>
-
-
         <receiver
             android:name=".MessageBroadcastReceiver"
             android:enabled="true"
