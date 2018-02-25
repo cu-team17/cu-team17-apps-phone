@@ -34,32 +34,13 @@ import android.widget.TextView;
 
 import java.util.Set;
 
-/**
- * This Activity appears as a dialog. It lists any paired devices and
- * devices detected in the area after discovery. When a device is chosen
- * by the user, the MAC address of the device is sent back to the parent
- * Activity in the result Intent.
- */
 public class BTFindDeviceActivity extends Activity {
 
-	/**
-	 * Tag for Log
-	 */
-	private static final String TAG = "BTFindDeviceActivity";
 
-	/**
-	 * Return Intent extra
-	 */
 	public static String EXTRA_DEVICE_ADDRESS = "device_address";
 
-	/**
-	 * Member fields
-	 */
 	private BluetoothAdapter mBtAdapter;
 
-	/**
-	 * Newly discovered devices
-	 */
 	private ArrayAdapter<String> mNewDevicesArrayAdapter;
 
 	@Override
@@ -138,9 +119,6 @@ public class BTFindDeviceActivity extends Activity {
 		this.unregisterReceiver(mReceiver);
 	}
 
-	/**
-	 * Start device discover with the BluetoothAdapter
-	 */
 	private void doDiscovery() {
 		//Log.d(TAG, "doDiscovery()");
 
@@ -161,9 +139,6 @@ public class BTFindDeviceActivity extends Activity {
 		mBtAdapter.startDiscovery();
 	}
 
-	/**
-	 * The on-click listener for all devices in the ListViews
-	 */
 	private AdapterView.OnItemClickListener mDeviceClickListener
 			= new AdapterView.OnItemClickListener() {
 		public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
@@ -184,10 +159,6 @@ public class BTFindDeviceActivity extends Activity {
 		}
 	};
 
-	/**
-	 * The BroadcastReceiver that listens for discovered devices and changes the title when
-	 * discovery is finished
-	 */
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
