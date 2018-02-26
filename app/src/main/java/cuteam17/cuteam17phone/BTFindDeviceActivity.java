@@ -179,7 +179,7 @@ public class BTFindDeviceActivity extends Activity {
 				setTitle("Select Device");
 				if (mNewDevicesArrayAdapter.getCount() == 0) {
 					//String noDevices = getResources().getText(R.string.none_found).toString();
-					String noDevices = "None Found";
+					String noDevices = "No Devices Found";
 					mNewDevicesArrayAdapter.add(noDevices);
 				}
 			}

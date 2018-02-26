@@ -2,10 +2,13 @@ package cuteam17.cuteam17phone;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -24,9 +27,15 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		if (savedInstanceState == null) {
-			establishPermissions();
+		establishPermissions();
+
+		/*
+		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
+		if (btDeviceAdr != null) {
+			// bluetooth setup
 		}
+		*/
 
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
@@ -38,13 +47,6 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		if (!mBluetoothAdapter.isEnabled()) {
-			Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
-		} else {
-			setupBluetooth();
-		}
-		//ToDO: bluetooth is enables start up
 	}
 
 	@Override
@@ -53,30 +55,41 @@ public class MainActivity extends AppCompatActivity {
 		//ToDo: stop bluetooth
 	}
 
+	public void setupBluetooth(View view) {
+		if (!mBluetoothAdapter.isEnabled()) {
+			Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
+		} else {
+			Intent serverIntent = new Intent(this, BTFindDeviceActivity.class);
+			startActivityForResult(serverIntent, REQUEST_CODE_DEVICE_LIST_ACTIVITY);
+		}
+	}
+
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case REQUEST_CODE_DEVICE_LIST_ACTIVITY:
 				if (resultCode == RESULT_OK) {
-					//ToDo: pass device to connect to
-					//ToDo: save device for later reference
+					try {
+						String btDeviceAdr = data.getExtras().getString(BTFindDeviceActivity.EXTRA_DEVICE_ADDRESS);
+						SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+						SharedPreferences.Editor editor = prefs.edit();
+						editor.putString("BT_Connected_Device", btDeviceAdr);
+						editor.apply();
+					} catch (NullPointerException e) {
+						return;
+					}
 				}
 				break;
 			case REQUEST_ENABLE_BLUETOOTH:
 				if (resultCode == RESULT_OK) {
-					setupBluetooth();
-				}
-				else {
+					Intent serverIntent = new Intent(this, BTFindDeviceActivity.class);
+					startActivityForResult(serverIntent, REQUEST_CODE_DEVICE_LIST_ACTIVITY);
+				} else {
 					Toast.makeText(this, "Bluetooth not enabled", Toast.LENGTH_SHORT).show();
 					finish();
 				}
 				break;
 		}
-	}
-
-	private void setupBluetooth() {
-		//ToDo: Bluetooth service
-		Intent serverIntent = new Intent(this, BTFindDeviceActivity.class);
-		startActivityForResult(serverIntent, REQUEST_CODE_DEVICE_LIST_ACTIVITY);
 	}
 
 	private boolean establishPermissions() {
