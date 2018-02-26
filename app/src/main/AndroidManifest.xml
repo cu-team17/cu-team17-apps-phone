@@ -28,6 +28,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".BTFindDeviceActivity"
+            android:screenOrientation="portrait" />
+
         <receiver
             android:name=".MessageBroadcastReceiver"
             android:enabled="true"
@@ -43,7 +47,6 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".BTFindDeviceActivity"/>
     </application>
 
 </manifest>

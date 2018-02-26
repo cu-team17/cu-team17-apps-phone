@@ -16,9 +16,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-	private static final int REQUEST_CODE_PERMISSIONS_LIST = 117;
-	private static final int REQUEST_CODE_DEVICE_LIST_ACTIVITY = 255;
-	private static final int REQUEST_ENABLE_BLUETOOTH = 59;
+	private static final int REQUEST_CODE_PERMISSIONS_LIST = 101;
+	private static final int REQUEST_CODE_DEVICE_LIST_ACTIVITY = 105;
+	private static final int REQUEST_ENABLE_BLUETOOTH = 110;
 
 	private BluetoothAdapter mBluetoothAdapter;
 
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 						SharedPreferences.Editor editor = prefs.edit();
 						editor.putString("BT_Connected_Device", btDeviceAdr);
 						editor.apply();
+						//ToDo: start connection, BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
 					} catch (NullPointerException e) {
 						return;
 					}
