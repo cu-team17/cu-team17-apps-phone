@@ -33,7 +33,7 @@ import android.widget.TextView;
 
 import java.util.Set;
 
-public class BTFindDeviceActivity extends Activity {
+public class BtFindDeviceActivity extends Activity {
 
 
 	public static String EXTRA_DEVICE_ADDRESS = "device_address";

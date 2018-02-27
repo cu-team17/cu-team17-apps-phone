@@ -2,6 +2,7 @@ package cuteam17.cuteam17phone;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +24,18 @@ public class MainActivity extends AppCompatActivity {
 
 	private BluetoothAdapter mBluetoothAdapter;
 
+	private BtTransferService btService;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		establishPermissions();
+
+		btService = BtTransferService.getInstance();
+		//ToDo: refactor so handler doesn't have to be set
+		btService.setmHandler(new BtHandler());
 
 		/*
 		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
@@ -60,9 +68,31 @@ public class MainActivity extends AppCompatActivity {
 			Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
 		} else {
-			Intent serverIntent = new Intent(this, BTFindDeviceActivity.class);
+			Intent serverIntent = new Intent(this, BtFindDeviceActivity.class);
 			startActivityForResult(serverIntent, REQUEST_CODE_DEVICE_LIST_ACTIVITY);
 		}
+	}
+
+	public void startBT(View view) {
+		btService.start();
+	}
+
+	public void connectBT(View view) {
+		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
+		if (btDeviceAdr != null) {
+			BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(btDeviceAdr);
+			btService.connect(device);
+		}
+	}
+
+	public void stopBT(View view) {
+		btService.stop();
+	}
+
+	public void writeBT(View view) {
+		String string = "Hello test";
+		btService.write(string.getBytes(Charset.forName("UTF-8")));
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -70,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 			case REQUEST_CODE_DEVICE_LIST_ACTIVITY:
 				if (resultCode == RESULT_OK) {
 					try {
-						String btDeviceAdr = data.getExtras().getString(BTFindDeviceActivity.EXTRA_DEVICE_ADDRESS);
+						String btDeviceAdr = data.getExtras().getString(BtFindDeviceActivity.EXTRA_DEVICE_ADDRESS);
 						SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
 						SharedPreferences.Editor editor = prefs.edit();
 						editor.putString("BT_Connected_Device", btDeviceAdr);
@@ -83,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 				break;
 			case REQUEST_ENABLE_BLUETOOTH:
 				if (resultCode == RESULT_OK) {
-					Intent serverIntent = new Intent(this, BTFindDeviceActivity.class);
+					Intent serverIntent = new Intent(this, BtFindDeviceActivity.class);
 					startActivityForResult(serverIntent, REQUEST_CODE_DEVICE_LIST_ACTIVITY);
 				} else {
 					Toast.makeText(this, "Bluetooth not enabled", Toast.LENGTH_SHORT).show();
