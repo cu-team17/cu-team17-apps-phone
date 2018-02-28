@@ -191,6 +191,7 @@ public class BtTransferService {
 	}
 
 	// Write to the ConnectedThread in an unsynchronized manner
+	/*
 	public void write(byte[] out) {
 		// Create temporary object
 		ConnectedThread r;
@@ -201,6 +202,28 @@ public class BtTransferService {
 		}
 		// Perform the write unsynchronized
 		r.write(out);
+	}*/
+
+	public void write(Object out, char header) {
+		ConnectedThread r;
+		// Synchronize a copy of the ConnectedThread
+		synchronized (this) {
+			if (mState != STATE_CONNECTED) return;
+			r = mConnectedThread;
+		}
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		try {
+			ObjectOutputStream objectStream = new ObjectOutputStream(outputStream);
+			objectStream.writeObject(out);
+			objectStream.close();
+		} catch (Exception e) {
+			return;
+		}
+		byte[] outSerialized = outputStream.toByteArray();
+
+		// Perform the write unsynchronized
+		r.write(outSerialized, header);
 	}
 
 	// Indicate that the connection attempt failed and notify the UI Activity
@@ -463,20 +486,13 @@ public class BtTransferService {
 		}
 
 		// Write to the connected OutStream.
-		public void write(byte[] buffer) {
+		public void write(byte[] buffer, char header) {
 			try {
-				char header = 49;
 				char eot = 4;
 
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 				outputStream.write((byte)header);
-
-				//ToDo: serialize and put into header
-				SMSTransferItem msg = new SMSTransferItem("This is my msg!!!", "3035550303");
-
-				ObjectOutputStream x = new ObjectOutputStream(outputStream);
-				x.writeObject(msg);
-				x.close();
+				outputStream.write(buffer);
 				outputStream.write((byte)eot);
 
 				mmOutStream.write(outputStream.toByteArray());

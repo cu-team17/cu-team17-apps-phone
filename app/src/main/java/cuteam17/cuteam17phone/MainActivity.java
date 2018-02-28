@@ -92,7 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
 	public void writeBT(View view) {
 		String string = "Hello test";
-		btService.write(string.getBytes(Charset.forName("UTF-8")));
+		//btService.write(string.getBytes(Charset.forName("UTF-8")));
+		SMSTransferItem msg = new SMSTransferItem("This is my msgdddd!!!", "3035550303");
+		btService.write(msg, msg.type.header);
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {

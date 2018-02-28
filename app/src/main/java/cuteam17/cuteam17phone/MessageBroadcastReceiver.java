@@ -9,6 +9,7 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 
 public class MessageBroadcastReceiver extends BroadcastReceiver {
 
@@ -18,11 +19,10 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 		String intentAction = intent.getAction();
 		if (intentAction == null) return;
 
-		String test = "This is a test string";
 		BtTransferService btTransfer = BtTransferService.getInstance();
-		if (btTransfer.getState() == BtTransferService.STATE_CONNECTED) {
-			btTransfer.write(test.getBytes(Charset.forName("UTF-8")));
-		}
+
+		SMSTransferItem msg = new SMSTransferItem("This is my msg!!!", "3035550303");
+		btTransfer.write(msg, (char)49);
 
 		if(intentAction.equals("android.provider.Telephony.SMS_RECEIVED")){
 			Log.d("Msg", "SMS");
@@ -38,6 +38,10 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 			}
 
 		} else if (intent.getAction().equals("android.provider.Telephony.WAP_PUSH_RECEIVED")) {
+			Bundle extras = intent.getExtras();
+			String s = new String((byte[])extras.get("header"));
+			Log.d("Please", s);
+
 			Log.d("Msg", "WAP");
 			Bundle bundle = intent.getExtras();
 			//Object[] b = (Object[]) bundle.get("header");

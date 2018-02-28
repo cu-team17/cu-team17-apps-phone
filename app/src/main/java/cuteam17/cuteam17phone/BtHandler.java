@@ -4,6 +4,7 @@ import android.os.Message;
 
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class BtHandler extends Handler {
 		switch (op) {
 			case BT_READ:
 				switch (msg.arg1) {
+					//ToDo: change to use header from TransferItemType
 					case 49:
 						handleSMS(msg);
 						break;
@@ -40,6 +42,8 @@ public class BtHandler extends Handler {
 			//ToDo: do nothing on the msg
 		}
 		Log.d("Msg", item.getMsg() + " " + item.getPhoneNumber());
+		//Toast.makeText(ClientA, "Bluetooth not enabled", Toast.LENGTH_SHORT).show();
+
 	}
 
 	private ObjectInputStream getObjectInputStream(Message msg) {

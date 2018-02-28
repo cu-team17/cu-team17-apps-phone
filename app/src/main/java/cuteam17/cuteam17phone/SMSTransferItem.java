@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class SMSTransferItem implements Serializable {
 
-	private static TransferItemType type = TransferItemType.SMS;
+	public TransferItemType type = TransferItemType.SMS;
 
 	private String msg;
 	private String phoneNumber;

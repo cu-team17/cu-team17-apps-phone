@@ -1,5 +1,11 @@
 package cuteam17.cuteam17phone;
 
 public enum TransferItemType {
-	SMS, MMS, INCOMING_PHONE_CALL, NOTIFICATION
+	SMS(49), MMS(50), INCOMING_PHONE_CALL(51), NOTIFICATION(52);
+
+	public final char header;
+
+	TransferItemType(int header) {
+		this.header = (char)header;
+	}
 }
