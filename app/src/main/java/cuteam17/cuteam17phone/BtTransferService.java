@@ -32,10 +32,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.UUID;
-import java.util.Arrays;
 
 public class BtTransferService {
 
@@ -62,6 +59,8 @@ public class BtTransferService {
 	public static final int STATE_LISTEN = 1;
 	public static final int STATE_CONNECTING = 2;
 	public static final int STATE_CONNECTED = 3;
+
+	private static final int HEADER_SIZE = 1;
 
 
 	private static BtTransferService singletonInstance = null;
@@ -407,7 +406,6 @@ public class BtTransferService {
 
 			int headerBytesRead = 0;
 
-			final int headerSize = 1;
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			ByteArrayOutputStream headerOutputStream = new ByteArrayOutputStream();
 
@@ -429,8 +427,8 @@ public class BtTransferService {
 					}
 
 					int offset = 0;
-					if (headerBytesRead < headerSize) {
-						offset = headerSize - headerBytesRead;
+					if (headerBytesRead < HEADER_SIZE) {
+						offset = HEADER_SIZE - headerBytesRead;
 						if (bytes < offset) {
 							headerOutputStream.write(buffer, 0, bytes);
 							headerBytesRead += bytes;
@@ -442,27 +440,20 @@ public class BtTransferService {
 					if (eot) {
 						if (offset < bytes) {
 							outputStream.write(buffer, offset, bytes-offset-1);
-							ByteArrayInputStream in = new ByteArrayInputStream(outputStream.toByteArray());
-							ObjectInputStream is = new ObjectInputStream(in);
-							//ToDo: deserialize based on header input
-							Person x = new Person();
-							try {
-								x = (Person) is.readObject();
-							} catch (Exception e) {}
+
+							mHandler.obtainMessage(BtOperations.BT_READ.ordinal(), (int)headerOutputStream.toByteArray()[0], 0, outputStream.toByteArray()).sendToTarget();
 
 							eot = false;
 							headerBytesRead = 0;
 							outputStream = new ByteArrayOutputStream();
 							headerOutputStream = new ByteArrayOutputStream();
+
 						}
 					} else {
 						if (offset < bytes) {
 							outputStream.write(buffer, offset, bytes-offset);
 						}
 					}
-					//byte[] fin = Arrays.copyOfRange(buffer, startText+1,end);
-
-					//mHandler.obtainMessage(4, bytes, -1, fin).sendToTarget();
 				} catch (IOException e) {
 					Log.e(TAG, "disconnected", e);
 					connectionLost();
@@ -474,17 +465,17 @@ public class BtTransferService {
 		// Write to the connected OutStream.
 		public void write(byte[] buffer) {
 			try {
-				char header = 31;
+				char header = 49;
 				char eot = 4;
 
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 				outputStream.write((byte)header);
 
 				//ToDo: serialize and put into header
-				Person hi = new Person();
-				hi.a = "yes yes yes!";
+				SMSTransferItem msg = new SMSTransferItem("This is my msg!!!", "3035550303");
+
 				ObjectOutputStream x = new ObjectOutputStream(outputStream);
-				x.writeObject(hi);
+				x.writeObject(msg);
 				x.close();
 				outputStream.write((byte)eot);
 
