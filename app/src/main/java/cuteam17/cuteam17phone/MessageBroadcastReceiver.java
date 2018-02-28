@@ -8,8 +8,7 @@ import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-import java.nio.charset.Charset;
-import java.util.HashMap;
+import cuteam17.cuteam17phone.BtTransferItems.SMSTransferItem;
 
 public class MessageBroadcastReceiver extends BroadcastReceiver {
 
@@ -19,33 +18,32 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 		String intentAction = intent.getAction();
 		if (intentAction == null) return;
 
-		BtTransferService btTransfer = BtTransferService.getInstance();
+		//BtTransferService btTransfer = BtTransferService.getInstance();
 
-		SMSTransferItem msg = new SMSTransferItem("This is my msg!!!", "3035550303");
-		btTransfer.write(msg, (char)49);
+		//SMSTransferItem msg = new SMSTransferItem("This is my msg!!!", "3035550303");
+		//btTransfer.write(msg, (char)49);
 
 		if(intentAction.equals("android.provider.Telephony.SMS_RECEIVED")){
 			Log.d("Msg", "SMS");
 
 			SmsMessage[] msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent);
 			for (int i = 0; i < msgs.length; i++) {
-				Log.d("Msg", msgs[i].getOriginatingAddress() + " " + msgs[i].getMessageBody());
-				/*
+				//Log.d("Msg", msgs[i].getOriginatingAddress() + " " + msgs[i].getMessageBody());
+				SMSTransferItem msg = new SMSTransferItem(msgs[i].getMessageBody(), msgs[i].getOriginatingAddress());
+
+				//ToDo: attempt to connect if btTransfer is not connected
 				BtTransferService btTransfer = BtTransferService.getInstance();
 				if (btTransfer.getState() == BtTransferService.STATE_CONNECTED) {
-					btTransfer.write(msgs[i].getMessageBody().getBytes(Charset.forName("UTF-8")));
-				}*/
+					btTransfer.write(msg, (char)49);
+				}
 			}
 
 		} else if (intent.getAction().equals("android.provider.Telephony.WAP_PUSH_RECEIVED")) {
+			Log.d("Msg", "WAP");
+
+			//ToDO: handle mms body
 			Bundle extras = intent.getExtras();
 			String s = new String((byte[])extras.get("header"));
-			Log.d("Please", s);
-
-			Log.d("Msg", "WAP");
-			Bundle bundle = intent.getExtras();
-			//Object[] b = (Object[]) bundle.get("header");
-			//ToDO: handle mms body
 		}
 
 	}

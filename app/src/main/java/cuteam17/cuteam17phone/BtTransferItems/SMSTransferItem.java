@@ -1,16 +1,17 @@
-package cuteam17.cuteam17phone;
+package cuteam17.cuteam17phone.BtTransferItems;
 
 import java.io.Serializable;
 
-public class SMSTransferItem implements Serializable {
+public class SMSTransferItem extends BtTransferItem implements Serializable {
 
-	public TransferItemType type = TransferItemType.SMS;
+	//public TransferItemType type = TransferItemType.SMS;
 
 	private String msg;
 	private String phoneNumber;
 	private String name;
 
 	public SMSTransferItem(String msg, String phoneNumber) {
+		super(TransferItemType.SMS);
 		this.msg = msg;
 		this.phoneNumber = phoneNumber;
 	}

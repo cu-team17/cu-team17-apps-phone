@@ -61,6 +61,7 @@ public class BtTransferService {
 	public static final int STATE_CONNECTED = 3;
 
 	private static final int HEADER_SIZE = 1;
+	private static final char EOT = 4;
 
 
 	private static BtTransferService singletonInstance = null;
@@ -425,7 +426,7 @@ public class BtTransferService {
 			byte[] buffer = new byte[1024];
 			int bytes;
 
-			boolean eot = false;
+			boolean readEOT = false;
 
 			int headerBytesRead = 0;
 
@@ -442,9 +443,10 @@ public class BtTransferService {
 					//Arrays.fill(buffer, (byte)0);
 					bytes = mmInStream.read(buffer);
 
+					//ToDo: check for header/EOT errors
 					for (int i =0; i < buffer.length; i++) {
-						if ((char)buffer[i] == 4) {
-							eot = true;
+						if ((char)buffer[i] == EOT) {
+							readEOT = true;
 							break;
 						}
 					}
@@ -460,13 +462,13 @@ public class BtTransferService {
 							headerBytesRead += offset;
 						}
 					}
-					if (eot) {
+					if (readEOT) {
 						if (offset < bytes) {
 							outputStream.write(buffer, offset, bytes-offset-1);
 
 							mHandler.obtainMessage(BtOperations.BT_READ.ordinal(), (int)headerOutputStream.toByteArray()[0], 0, outputStream.toByteArray()).sendToTarget();
 
-							eot = false;
+							readEOT = false;
 							headerBytesRead = 0;
 							outputStream = new ByteArrayOutputStream();
 							headerOutputStream = new ByteArrayOutputStream();
@@ -488,12 +490,10 @@ public class BtTransferService {
 		// Write to the connected OutStream.
 		public void write(byte[] buffer, char header) {
 			try {
-				char eot = 4;
-
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 				outputStream.write((byte)header);
 				outputStream.write(buffer);
-				outputStream.write((byte)eot);
+				outputStream.write((byte)EOT);
 
 				mmOutStream.write(outputStream.toByteArray());
 				//ToDo: make what into constant

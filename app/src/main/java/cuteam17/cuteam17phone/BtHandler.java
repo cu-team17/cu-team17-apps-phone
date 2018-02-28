@@ -1,17 +1,24 @@
 package cuteam17.cuteam17phone;
 
+import android.content.Context;
 import android.os.Message;
 
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Arrays;
+
+import cuteam17.cuteam17phone.BtTransferItems.SMSTransferItem;
 
 public class BtHandler extends Handler {
+
+	private Context mContext;
+
+	public BtHandler(Context context) {
+		mContext = context;
+	}
 
 	@Override
 	public void handleMessage(Message msg) {
@@ -41,8 +48,8 @@ public class BtHandler extends Handler {
 			return;
 			//ToDo: do nothing on the msg
 		}
-		Log.d("Msg", item.getMsg() + " " + item.getPhoneNumber());
-		//Toast.makeText(ClientA, "Bluetooth not enabled", Toast.LENGTH_SHORT).show();
+		//Log.d("Msg", item.getMsg() + " " + item.getPhoneNumber());
+		Toast.makeText(mContext, item.getMsg(), Toast.LENGTH_SHORT).show();
 
 	}
 

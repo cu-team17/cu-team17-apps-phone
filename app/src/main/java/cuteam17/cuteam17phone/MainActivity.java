@@ -12,9 +12,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import cuteam17.cuteam17phone.BtTransferItems.SMSTransferItem;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
 		establishPermissions();
 
 		btService = BtTransferService.getInstance();
-		//ToDo: refactor so handler doesn't have to be set
-		btService.setmHandler(new BtHandler());
+		//ToDo: refactor so handler doesn't have to be set, move handler out of UI thread
+		btService.setmHandler(new BtHandler(this));
 
 		/*
 		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
