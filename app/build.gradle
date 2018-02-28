@@ -5,7 +5,7 @@ android {
     defaultConfig {
         applicationId "cuteam17.cuteam17phone"
         minSdkVersion 24
-        targetSdkVersion 26
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

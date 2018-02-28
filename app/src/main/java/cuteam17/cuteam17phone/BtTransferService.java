@@ -25,10 +25,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.UUID;
+import java.util.Arrays;
 
 public class BtTransferService {
 
@@ -396,13 +403,66 @@ public class BtTransferService {
 			byte[] buffer = new byte[1024];
 			int bytes;
 
+			boolean eot = false;
+
+			int headerBytesRead = 0;
+
+			final int headerSize = 1;
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			ByteArrayOutputStream headerOutputStream = new ByteArrayOutputStream();
+
 			// Keep listening to the InputStream while connected
 			while (mState == STATE_CONNECTED) {
 				try {
-					// Read from the InputStream
+					/*
+					try {
+						Thread.sleep(10000);
+					} catch (Exception e) {}*/
+					//Arrays.fill(buffer, (byte)0);
 					bytes = mmInStream.read(buffer);
-					Log.d(TAG, new String(buffer, "UTF-8"));
-					mHandler.obtainMessage(4, bytes, -1, buffer).sendToTarget();
+
+					for (int i =0; i < buffer.length; i++) {
+						if ((char)buffer[i] == 4) {
+							eot = true;
+							break;
+						}
+					}
+
+					int offset = 0;
+					if (headerBytesRead < headerSize) {
+						offset = headerSize - headerBytesRead;
+						if (bytes < offset) {
+							headerOutputStream.write(buffer, 0, bytes);
+							headerBytesRead += bytes;
+						} else {
+							headerOutputStream.write(buffer, 0, offset);
+							headerBytesRead += offset;
+						}
+					}
+					if (eot) {
+						if (offset < bytes) {
+							outputStream.write(buffer, offset, bytes-offset-1);
+							ByteArrayInputStream in = new ByteArrayInputStream(outputStream.toByteArray());
+							ObjectInputStream is = new ObjectInputStream(in);
+							//ToDo: deserialize based on header input
+							Person x = new Person();
+							try {
+								x = (Person) is.readObject();
+							} catch (Exception e) {}
+
+							eot = false;
+							headerBytesRead = 0;
+							outputStream = new ByteArrayOutputStream();
+							headerOutputStream = new ByteArrayOutputStream();
+						}
+					} else {
+						if (offset < bytes) {
+							outputStream.write(buffer, offset, bytes-offset);
+						}
+					}
+					//byte[] fin = Arrays.copyOfRange(buffer, startText+1,end);
+
+					//mHandler.obtainMessage(4, bytes, -1, fin).sendToTarget();
 				} catch (IOException e) {
 					Log.e(TAG, "disconnected", e);
 					connectionLost();
@@ -414,8 +474,23 @@ public class BtTransferService {
 		// Write to the connected OutStream.
 		public void write(byte[] buffer) {
 			try {
-				mmOutStream.write(buffer);
-				mHandler.obtainMessage(2, -1, -1, buffer).sendToTarget();
+				char header = 31;
+				char eot = 4;
+
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+				outputStream.write((byte)header);
+
+				//ToDo: serialize and put into header
+				Person hi = new Person();
+				hi.a = "yes yes yes!";
+				ObjectOutputStream x = new ObjectOutputStream(outputStream);
+				x.writeObject(hi);
+				x.close();
+				outputStream.write((byte)eot);
+
+				mmOutStream.write(outputStream.toByteArray());
+				//ToDo: make what into constant
+				//mHandler.obtainMessage(2, -1, -1, buffer).sendToTarget();
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
