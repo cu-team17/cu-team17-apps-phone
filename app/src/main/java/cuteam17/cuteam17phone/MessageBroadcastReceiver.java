@@ -18,10 +18,10 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 		String intentAction = intent.getAction();
 		if (intentAction == null) return;
 
-		//BtTransferService btTransfer = BtTransferService.getInstance();
+		//BtTransferService btTransfer2 = BtTransferService.getInstance();
+		//SMSTransferItem msg2 = new SMSTransferItem("This is my msg!!!", "3035550303");
+		//btTransfer2.write(msg2, (char)49);
 
-		//SMSTransferItem msg = new SMSTransferItem("This is my msg!!!", "3035550303");
-		//btTransfer.write(msg, (char)49);
 
 		if(intentAction.equals("android.provider.Telephony.SMS_RECEIVED")){
 			Log.d("Msg", "SMS");
@@ -33,6 +33,7 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 
 				//ToDo: attempt to connect if btTransfer is not connected
 				BtTransferService btTransfer = BtTransferService.getInstance();
+				//btTransfer.setmHandler(new BtHandler(context));
 				if (btTransfer.getState() == BtTransferService.STATE_CONNECTED) {
 					btTransfer.write(msg, (char)49);
 				}

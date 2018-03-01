@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
 	private BluetoothAdapter mBluetoothAdapter;
 
 	private BtTransferService btService;
+
+	public final static int OVERLAY_REQUEST_CODE = 5463&0xffffff00;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		//ToDo: add overlays permission request result
 		switch (requestCode) {
 			case REQUEST_CODE_DEVICE_LIST_ACTIVITY:
 				if (resultCode == RESULT_OK) {
@@ -127,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private boolean establishPermissions() {
+		if (!Settings.canDrawOverlays(this)) {
+			Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+			startActivityForResult(i, OVERLAY_REQUEST_CODE);
+		}
+
 		List<String> permissionsList = new ArrayList<String>();
 
 		addPermissionToList(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION);

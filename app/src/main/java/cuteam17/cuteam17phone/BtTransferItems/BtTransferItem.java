@@ -1,6 +1,8 @@
 package cuteam17.cuteam17phone.BtTransferItems;
 
-public abstract class BtTransferItem {
+import java.io.Serializable;
+
+public abstract class BtTransferItem implements Serializable {
 
 	public TransferItemType type;
 
