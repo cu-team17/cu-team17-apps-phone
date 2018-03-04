@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
 
@@ -63,14 +64,11 @@ public class BtHandler extends Handler {
 			return;
 			//ToDo: do nothing on the msg
 		}
-
-		Log.d(item.getMsg(), item.getPhoneNumber());
-		Intent in = new Intent(mContext, OverlayActivity.class);
-		mContext.startActivity(in);
-	}
-
-	public void test() {
-		Toast.makeText(mContext, "This is a test", Toast.LENGTH_SHORT).show();
+		Intent overlay = new Intent(mContext, OverlayActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(OverlayActivity.INTENT_EXTRA, item);
+		overlay.putExtras(bundle);
+		mContext.startActivity(overlay);
 	}
 
 	private ObjectInputStream getObjectInputStream(Message msg) {

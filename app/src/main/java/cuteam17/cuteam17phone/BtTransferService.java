@@ -89,6 +89,7 @@ public class BtTransferService extends Service {
 	public void onCreate() {
 		super.onCreate();
 
+		Log.d("Start", "service");
 		HandlerThread thread = new HandlerThread("Thread name", android.os.Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 		Looper looper = thread.getLooper();
@@ -98,7 +99,12 @@ public class BtTransferService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent == null || intent.getAction() == null) {
-			Log.d("Null", "start");
+			SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+			String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
+			if (btDeviceAdr != null) {
+				BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
+				connect(device);
+			}
 			return START_STICKY;
 		}
 
@@ -124,6 +130,7 @@ public class BtTransferService extends Service {
 				} catch (Exception e) {
 					return START_STICKY;
 				}
+				break;
 		}
 
 		//ToDO: set correct return type
@@ -325,7 +332,7 @@ public class BtTransferService extends Service {
 					// successful connection or an exception
 					socket = mmServerSocket.accept();
 				} catch (IOException e) {
-					Log.e(TAG, "accept() failed", e);
+					Log.e(TAG, "accept() failed");
 					break;
 				}
 
@@ -380,7 +387,7 @@ public class BtTransferService extends Service {
 			try {
 				tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
 			} catch (IOException e) {
-				Log.e(TAG, "create() failed", e);
+				Log.e(TAG, "create() failed");
 			}
 			mmSocket = tmp;
 			mState = STATE_CONNECTING;
@@ -399,10 +406,10 @@ public class BtTransferService extends Service {
 				try {
 					mmSocket.close();
 				} catch (IOException e2) {
-					Log.e(TAG, "unable to close() socket during connection failure", e2);
+					Log.e(TAG, "unable to close() socket during connection failure");
 				}
 				//ToDo: don't run connectionFailed
-				connectionFailed();
+				//connectionFailed();
 				return;
 			}
 
@@ -418,7 +425,7 @@ public class BtTransferService extends Service {
 			try {
 				mmSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG, "close() of socket failed", e);
+				Log.e(TAG, "close() of socket failed");
 			}
 		}
 	}

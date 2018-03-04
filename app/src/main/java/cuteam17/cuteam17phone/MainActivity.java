@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -111,7 +112,8 @@ public class MainActivity extends AppCompatActivity {
 						SharedPreferences.Editor editor = prefs.edit();
 						editor.putString("BT_Connected_Device", btDeviceAdr);
 						editor.apply();
-						//ToDo: start connection, BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+
+						connectBT(null);
 					} catch (NullPointerException e) {
 						return;
 					}
