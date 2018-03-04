@@ -2,7 +2,6 @@ package cuteam17.cuteam17phone;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
 	private BluetoothAdapter mBluetoothAdapter;
 
-	private BtTransferService btService;
-
 	public final static int OVERLAY_REQUEST_CODE = 5463&0xffffff00;
 
 	@Override
@@ -37,10 +34,6 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 
 		establishPermissions();
-
-		btService = BtTransferService.getInstance();
-		//ToDo: refactor so handler doesn't have to be set, move handler out of UI thread
-		btService.setmHandler(new BtHandler(this));
 
 		/*
 		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
@@ -79,27 +72,32 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void startBT(View view) {
-		btService.start();
+		Intent intent = new Intent(this, BtTransferService.class);
+		intent.setAction(BtTransferService.BT_START);
+		startService(intent);
 	}
 
 	public void connectBT(View view) {
-		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
-		if (btDeviceAdr != null) {
-			BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(btDeviceAdr);
-			btService.connect(device);
-		}
+		Intent intent = new Intent(this, BtTransferService.class);
+		intent.setAction(BtTransferService.BT_CONNECT);
+		startService(intent);
 	}
 
 	public void stopBT(View view) {
-		btService.stop();
+		Intent intent = new Intent(this, BtTransferService.class);
+		intent.setAction(BtTransferService.BT_STOP);
+		startService(intent);
 	}
 
 	public void writeBT(View view) {
-		String string = "Hello test";
-		//btService.write(string.getBytes(Charset.forName("UTF-8")));
 		SMSTransferItem msg = new SMSTransferItem("This is my msgdddd!!!", "3035550303");
-		btService.write(msg, msg.type.header);
+
+		Intent intent = new Intent(this, BtTransferService.class);
+		intent.setAction(BtTransferService.BT_WRITE);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(BtTransferService.INTENT_EXTRA_WRITE, msg);
+		intent.putExtras(bundle);
+		startService(intent);
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {

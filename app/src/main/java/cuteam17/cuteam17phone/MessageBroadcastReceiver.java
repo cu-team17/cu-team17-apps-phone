@@ -18,9 +18,14 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 		String intentAction = intent.getAction();
 		if (intentAction == null) return;
 
-		//BtTransferService btTransfer2 = BtTransferService.getInstance();
-		//SMSTransferItem msg2 = new SMSTransferItem("This is my msg!!!", "3035550303");
-		//btTransfer2.write(msg2, (char)49);
+		SMSTransferItem msg = new SMSTransferItem("Hi Hi", "3035550303");
+
+		Intent intentTest = new Intent(context, BtTransferService.class);
+		intentTest.setAction(BtTransferService.BT_WRITE);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(BtTransferService.INTENT_EXTRA_WRITE, msg);
+		intentTest.putExtras(bundle);
+		context.startService(intentTest);
 
 
 		if(intentAction.equals("android.provider.Telephony.SMS_RECEIVED")){
@@ -29,14 +34,8 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 			SmsMessage[] msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent);
 			for (int i = 0; i < msgs.length; i++) {
 				//Log.d("Msg", msgs[i].getOriginatingAddress() + " " + msgs[i].getMessageBody());
-				SMSTransferItem msg = new SMSTransferItem(msgs[i].getMessageBody(), msgs[i].getOriginatingAddress());
+				//SMSTransferItem msg = new SMSTransferItem(msgs[i].getMessageBody(), msgs[i].getOriginatingAddress());
 
-				//ToDo: attempt to connect if btTransfer is not connected
-				BtTransferService btTransfer = BtTransferService.getInstance();
-				//btTransfer.setmHandler(new BtHandler(context));
-				if (btTransfer.getState() == BtTransferService.STATE_CONNECTED) {
-					btTransfer.write(msg, (char)49);
-				}
 			}
 
 		} else if (intent.getAction().equals("android.provider.Telephony.WAP_PUSH_RECEIVED")) {

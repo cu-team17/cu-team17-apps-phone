@@ -44,6 +44,12 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".OverlayActivity"
+            android:theme="@android:style/Theme.NoDisplay" />
+
+        <service
+            android:name=".BtTransferService"/>
     </application>
 
 </manifest>

@@ -17,24 +17,31 @@ package cuteam17.cuteam17phone;
  * limitations under the License.
  */
 
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-public class BtTransferService {
+import cuteam17.cuteam17phone.BtTransferItems.BtTransferItem;
+
+public class BtTransferService extends Service {
 
 	// Debugging
 	private static final String TAG = "BtTransferService ";
@@ -48,9 +55,9 @@ public class BtTransferService {
 
 	private final BluetoothAdapter mAdapter;
 	private Handler mHandler;
-	private AcceptThread mSecureAcceptThread;
-	private ConnectThread mConnectThread;
-	private ConnectedThread mConnectedThread;
+	private BtTransferService.AcceptThread mSecureAcceptThread;
+	private BtTransferService.ConnectThread mConnectThread;
+	private BtTransferService.ConnectedThread mConnectedThread;
 	private int mState;
 	private int mNewState;
 
@@ -63,34 +70,70 @@ public class BtTransferService {
 	private static final int HEADER_SIZE = 1;
 	private static final char EOT = 4;
 
+	public static final String BT_START = "Start";
+	public static final String BT_CONNECT = "Connect";
+	public static final String BT_STOP = "Stop";
+	public static final String BT_WRITE = "Write";
 
-	private static BtTransferService singletonInstance = null;
+	public static final String INTENT_EXTRA_WRITE = "EXTRA";
 
-	private BtTransferService() {
+	//private BtHandler mHandler;
+
+	public BtTransferService() {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mNewState = mState;
 	}
 
-	public static BtTransferService getInstance() {
-		if (singletonInstance == null) {
-			singletonInstance = new BtTransferService();
+	@Override
+	public void onCreate() {
+		super.onCreate();
+
+		HandlerThread thread = new HandlerThread("Thread name", android.os.Process.THREAD_PRIORITY_BACKGROUND);
+		thread.start();
+		Looper looper = thread.getLooper();
+		mHandler = new BtHandler(this, looper);
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		if (intent == null || intent.getAction() == null) {
+			Log.d("Null", "start");
+			return START_STICKY;
 		}
-		return singletonInstance;
+
+		switch (intent.getAction()) {
+			case BtTransferService.BT_START:
+				start();
+				break;
+			case BtTransferService.BT_CONNECT:
+				SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+				String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
+				if (btDeviceAdr != null) {
+					BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
+					connect(device);
+				}
+				break;
+			case BtTransferService.BT_STOP:
+				stop();
+				break;
+			case BtTransferService.BT_WRITE:
+				try {
+					BtTransferItem item = (BtTransferItem) intent.getExtras().getSerializable(INTENT_EXTRA_WRITE);
+					write(item, item.type.header);
+				} catch (Exception e) {
+					return START_STICKY;
+				}
+		}
+
+		//ToDO: set correct return type
+		return Service.START_STICKY;
 	}
 
-	//ToDo: potentially don't allow handler to be set from outside class
-	public void setmHandler(Handler mHandler) {
-		this.mHandler = mHandler;
-	}
-
-	// Update UI title according to the current state of the chat connection
-	private synchronized void updateUserInterfaceTitle() {
-		mState = getState();
-		mNewState = mState;
-
-		// Give the new state to the Handler so the UI Activity can update
-		//mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, mNewState, -1).sendToTarget();
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO: Return the communication channel to the service.
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	public synchronized int getState() {
@@ -110,7 +153,7 @@ public class BtTransferService {
 		}
 
 		if (mSecureAcceptThread == null) {
-			mSecureAcceptThread = new AcceptThread();
+			mSecureAcceptThread = new BtTransferService.AcceptThread();
 			mSecureAcceptThread.start();
 		}
 
@@ -131,7 +174,7 @@ public class BtTransferService {
 			mConnectedThread = null;
 		}
 
-		mConnectThread = new ConnectThread(device);
+		mConnectThread = new BtTransferService.ConnectThread(device);
 		mConnectThread.start();
 
 		//updateUserInterfaceTitle();
@@ -156,7 +199,7 @@ public class BtTransferService {
 		}
 
 		// Start the thread to manage the connection and perform transmissions
-		mConnectedThread = new ConnectedThread(socket);
+		mConnectedThread = new BtTransferService.ConnectedThread(socket);
 		mConnectedThread.start();
 
 		// Send the name of the connected device back to the UI Activity
@@ -192,21 +235,8 @@ public class BtTransferService {
 	}
 
 	// Write to the ConnectedThread in an unsynchronized manner
-	/*
-	public void write(byte[] out) {
-		// Create temporary object
-		ConnectedThread r;
-		// Synchronize a copy of the ConnectedThread
-		synchronized (this) {
-			if (mState != STATE_CONNECTED) return;
-			r = mConnectedThread;
-		}
-		// Perform the write unsynchronized
-		r.write(out);
-	}*/
-
 	public void write(Object out, char header) {
-		ConnectedThread r;
+		BtTransferService.ConnectedThread r;
 		// Synchronize a copy of the ConnectedThread
 		synchronized (this) {
 			if (mState != STATE_CONNECTED) return;
@@ -331,7 +361,6 @@ public class BtTransferService {
 			}
 		}
 	}
-
 
 	/**
 	 * This thread runs while attempting to make an outgoing connection
