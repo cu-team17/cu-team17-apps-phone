@@ -25,11 +25,8 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -44,7 +41,7 @@ import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
 public class BtTransferService extends Service {
 
 	// Debugging
-	private static final String TAG = "BtTransferService ";
+	private static final String TAG = "BtTransferService";
 
 	// Name for the SDP record when creating server socket
 	private static final String NAME_SECURE = "BluetoothTransferSecure";
@@ -67,15 +64,15 @@ public class BtTransferService extends Service {
 	public static final int STATE_CONNECTING = 2;
 	public static final int STATE_CONNECTED = 3;
 
-	private static final int HEADER_SIZE = 1;
-	private static final char EOT = 4;
-
 	public static final String BT_START = "Start";
 	public static final String BT_CONNECT = "Connect";
 	public static final String BT_STOP = "Stop";
 	public static final String BT_WRITE = "Write";
 
 	public static final String INTENT_EXTRA_WRITE = "EXTRA";
+
+	private static final int HEADER_SIZE = 1;
+	private static final char EOT = 4;
 
 	public BtTransferService() {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -89,14 +86,14 @@ public class BtTransferService extends Service {
 	}
 
 	@Override
+	public void onDestroy() {
+		//ToDo: close all threads
+	}
+
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent == null || intent.getAction() == null) {
-			SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-			String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
-			if (btDeviceAdr != null) {
-				BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
-				connect(device);
-			}
+			connectionRestart();
 			return START_STICKY;
 		}
 
@@ -117,7 +114,6 @@ public class BtTransferService extends Service {
 				break;
 			case BtTransferService.BT_WRITE:
 				try {
-					Log.d("no", "why");
 					BtTransferItem item = (BtTransferItem) intent.getExtras().getSerializable(INTENT_EXTRA_WRITE);
 					write(item, item.type.header);
 				} catch (Exception e) {
@@ -126,7 +122,6 @@ public class BtTransferService extends Service {
 				break;
 		}
 
-		//ToDO: set correct return type
 		return Service.START_STICKY;
 	}
 
@@ -138,10 +133,6 @@ public class BtTransferService extends Service {
 
 	public void setHandler(Handler mHandler) {
 		this.mHandler = mHandler;
-	}
-
-	public synchronized int getState() {
-		return mState;
 	}
 
 	// start AcceptThread to begin a session in listening (server) mode.
@@ -160,8 +151,15 @@ public class BtTransferService extends Service {
 			mSecureAcceptThread = new BtTransferService.AcceptThread();
 			mSecureAcceptThread.start();
 		}
+	}
 
-		//updateUserInterfaceTitle();
+	public void connectByPref() {
+		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
+		if (btDeviceAdr != null) {
+			BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
+			connect(device);
+		}
 	}
 
 	// Start the ConnectThread to initiate a connection to a remote device.
@@ -180,8 +178,6 @@ public class BtTransferService extends Service {
 
 		mConnectThread = new BtTransferService.ConnectThread(device);
 		mConnectThread.start();
-
-		//updateUserInterfaceTitle();
 	}
 
 	// Start the ConnectedThread to begin managing a Bluetooth connection
@@ -206,14 +202,7 @@ public class BtTransferService extends Service {
 		mConnectedThread = new BtTransferService.ConnectedThread(socket);
 		mConnectedThread.start();
 
-		// Send the name of the connected device back to the UI Activity
-		//Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
-		Bundle bundle = new Bundle();
-		//bundle.putString(Constants.DEVICE_NAME, device.getName());
-		//msg.setData(bundle);
-		//mHandler.sendMessage(msg);
-
-		//updateUserInterfaceTitle();
+		//device.getName();
 	}
 
 	// Stop all threads
@@ -261,38 +250,19 @@ public class BtTransferService extends Service {
 		r.write(outSerialized, header);
 	}
 
-	// Indicate that the connection attempt failed and notify the UI Activity
-	private void connectionFailed() {
-		// Send a failure message back to the Activity
-		//Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		//bundle.putString(Constants.TOAST, "Unable to connect device");
-		//msg.setData(bundle);
-		//mHandler.sendMessage(msg);
-
+	// Indicate that the connection attempt failed
+	protected void connectFailed() {
 		mState = STATE_NONE;
-
-		//updateUserInterfaceTitle();
-
-		// Start the service over to restart listening mode
-		BtTransferService.this.start();
+		//ToDo: wait before reattempting to connect
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {}
+		connectByPref();
 	}
 
-	// Indicate that the connection was lost and notify the UI Activity.
-	private void connectionLost() {
-		// Send a failure message back to the Activity
-		//Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		//bundle.putString(Constants.TOAST, "Device connection was lost");
-		//msg.setData(bundle);
-		//mHandler.sendMessage(msg);
-
+	// Indicate that the connection was lost
+	protected void connectionRestart() {
 		mState = STATE_NONE;
-		// Update UI title
-		//updateUserInterfaceTitle();
-
-		// Start the service over to restart listening mode
-		BtTransferService.this.start();
 	}
 
 	/**
@@ -311,7 +281,7 @@ public class BtTransferService extends Service {
 			try {
 				tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE, MY_UUID_SECURE);
 			} catch (IOException e) {
-				Log.e(TAG, "listen() failed", e);
+				Log.e(TAG+"-Accept", "listen() failed");
 			}
 			mmServerSocket = tmp;
 			mState = STATE_LISTEN;
@@ -320,7 +290,7 @@ public class BtTransferService extends Service {
 		public void run() {
 			setName("AcceptThread");
 
-			BluetoothSocket socket = null;
+			BluetoothSocket socket;
 
 			// Listen to the server socket if we're not connected
 			while (mState != STATE_CONNECTED) {
@@ -329,7 +299,7 @@ public class BtTransferService extends Service {
 					// successful connection or an exception
 					socket = mmServerSocket.accept();
 				} catch (IOException e) {
-					Log.e(TAG, "accept() failed");
+					Log.e(TAG+"-Accept", "accept() failed");
 					break;
 				}
 
@@ -339,7 +309,6 @@ public class BtTransferService extends Service {
 						switch (mState) {
 							case STATE_LISTEN:
 							case STATE_CONNECTING:
-								// Situation normal. Start the connected thread.
 								connected(socket, socket.getRemoteDevice());
 								break;
 							case STATE_NONE:
@@ -348,7 +317,7 @@ public class BtTransferService extends Service {
 								try {
 									socket.close();
 								} catch (IOException e) {
-									Log.e(TAG, "close() of unwanted socket failed", e);
+									Log.e(TAG+"-Accept", "close() of unwanted socket failed");
 								}
 								break;
 						}
@@ -361,7 +330,7 @@ public class BtTransferService extends Service {
 			try {
 				mmServerSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG, "close() of server socket failed", e);
+				Log.e(TAG+"-Accept", "close() of server socket failed", e);
 			}
 		}
 	}
@@ -384,7 +353,7 @@ public class BtTransferService extends Service {
 			try {
 				tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
 			} catch (IOException e) {
-				Log.e(TAG, "create() failed");
+				Log.e(TAG+"-Connect", "create() failed");
 			}
 			mmSocket = tmp;
 			mState = STATE_CONNECTING;
@@ -403,10 +372,11 @@ public class BtTransferService extends Service {
 				try {
 					mmSocket.close();
 				} catch (IOException e2) {
-					Log.e(TAG, "unable to close() socket during connection failure");
+					Log.e(TAG+"-Connect", "unable to close() socket during connection failure");
 				}
-				//ToDo: don't run connectionFailed
-				//connectionFailed();
+
+				connectFailed();
+				Log.e(TAG+"-Connect", "connect() failed");
 				return;
 			}
 
@@ -422,7 +392,7 @@ public class BtTransferService extends Service {
 			try {
 				mmSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG, "close() of socket failed");
+				Log.e(TAG+"-Connect", "close() of socket failed");
 			}
 		}
 	}
@@ -446,7 +416,7 @@ public class BtTransferService extends Service {
 				tmpIn = socket.getInputStream();
 				tmpOut = socket.getOutputStream();
 			} catch (IOException e) {
-				Log.e(TAG, "temp sockets not created", e);
+				Log.e(TAG+"-Connected", "temp sockets not created");
 			}
 
 			mmInStream = tmpIn;
@@ -455,7 +425,7 @@ public class BtTransferService extends Service {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectedThread");
+			Log.d(TAG+"-Connected", "BEGIN");
 			byte[] buffer = new byte[1024];
 			int bytes;
 
@@ -513,8 +483,8 @@ public class BtTransferService extends Service {
 						}
 					}
 				} catch (IOException e) {
-					Log.e(TAG, "disconnected", e);
-					connectionLost();
+					Log.e(TAG+"-Connected", "Disconnected");
+					connectionRestart();
 					break;
 				}
 			}
@@ -532,7 +502,7 @@ public class BtTransferService extends Service {
 				//ToDo: make what into constant
 				//mHandler.obtainMessage(2, -1, -1, buffer).sendToTarget();
 			} catch (IOException e) {
-				Log.e(TAG, "Exception during write", e);
+				Log.e(TAG+"-Connected", "Exception during write");
 			}
 		}
 
@@ -540,7 +510,7 @@ public class BtTransferService extends Service {
 			try {
 				mmSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG, "close() of connect socket failed", e);
+				Log.e(TAG+"-Connected", "close() of connected socket failed");
 			}
 		}
 	}

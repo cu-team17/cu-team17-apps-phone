@@ -16,4 +16,10 @@ public class PhoneBtTransferService extends BtTransferService {
 		setHandler(new BtHandler(this, looper));
 	}
 
+	protected void connectionRestart() {
+		super.connectionRestart();
+		start();
+	}
+
+
 }

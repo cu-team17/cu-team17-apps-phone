@@ -27,6 +27,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="cuteam17.cuteam17btlibrary.BtFindDeviceActivity" />
+
         <receiver
             android:name=".MessageBroadcastReceiver"
             android:enabled="true"

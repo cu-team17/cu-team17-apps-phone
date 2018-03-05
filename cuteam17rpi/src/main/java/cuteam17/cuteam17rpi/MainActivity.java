@@ -141,9 +141,6 @@ public class MainActivity extends AppCompatActivity {
 		List<String> permissionsList = new ArrayList<String>();
 
 		addPermissionToList(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION);
-		addPermissionToList(permissionsList, Manifest.permission.RECEIVE_SMS);
-		addPermissionToList(permissionsList, Manifest.permission.READ_PHONE_STATE);
-		addPermissionToList(permissionsList, Manifest.permission.READ_CONTACTS);
 
 		if (!permissionsList.isEmpty()) {
 			requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), REQUEST_CODE_PERMISSIONS_LIST);

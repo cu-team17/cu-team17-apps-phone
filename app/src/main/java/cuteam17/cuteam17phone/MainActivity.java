@@ -28,24 +28,10 @@ public class MainActivity extends AppCompatActivity {
 
 	private BluetoothAdapter mBluetoothAdapter;
 
-	public final static int OVERLAY_REQUEST_CODE = 5463&0xffffff00;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		/*
-		//ToDo: temp fix
-		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-		Boolean deviceType = prefs.getBoolean("Device_Type", false);
-		if (!deviceType) {
-			if (Build.VERSION.SDK_INT >= 26) {
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putBoolean("Device_Type", true);
-				editor.apply();
-			}
-		}*/
 
 		establishPermissions();
 
@@ -104,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void writeBT(View view) {
-		SMSTransferItem msg = new SMSTransferItem("This is my msgdddd!!!", "3035550303");
+		SMSTransferItem msg = new SMSTransferItem("This is my Test message!!!?", "3035550303");
 
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
 		intent.setAction(PhoneBtTransferService.BT_WRITE);
@@ -126,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 						editor.putString("BT_Connected_Device", btDeviceAdr);
 						editor.apply();
 
-						connectBT(null);
+						startBT(null);
 					} catch (NullPointerException e) {
 						return;
 					}
@@ -145,11 +131,6 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private boolean establishPermissions() {
-		if (!Settings.canDrawOverlays(this)) {
-			Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-			startActivityForResult(i, OVERLAY_REQUEST_CODE);
-		}
-
 		List<String> permissionsList = new ArrayList<String>();
 
 		addPermissionToList(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION);
