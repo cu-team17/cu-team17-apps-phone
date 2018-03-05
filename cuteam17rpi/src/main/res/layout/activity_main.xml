@@ -19,35 +19,4 @@
         android:onClick="setupBluetooth"
         android:background="@drawable/bt_button"/>
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start"
-        android:onClick="startBT"/>
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@+id/button1"
-        android:text="Connect"
-        android:onClick="connectBT"/>
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@+id/button2"
-        android:text="Stop"
-        android:onClick="stopBT"/>
-
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@+id/button3"
-        android:text="Write"
-        android:onClick="writeBT"/>
-
 </android.support.constraint.ConstraintLayout>

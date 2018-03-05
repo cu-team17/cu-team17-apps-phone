@@ -35,8 +35,23 @@ public class OverlayActivity extends AppCompatActivity {
 		LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		msgView = vi.inflate(R.layout.transfer_sms_message, null);
 
-		TextView t = msgView.findViewById(R.id.MsgBody);
-		t.setText(msg.getMsg());
+		try {
+			String rawPhoneNumber = msg.getPhoneNumber();
+			if (rawPhoneNumber != null) {
+				TextView header = msgView.findViewById(R.id.MsgHeaderText);
+				java.text.MessageFormat phoneNumberFmt = new java.text.MessageFormat("({0})-{1}-{2}");
+				String[] phoneNumArr={rawPhoneNumber.substring(0, 3),
+						rawPhoneNumber.substring(3,6),
+						rawPhoneNumber.substring(6)};
+				header.setText(phoneNumberFmt.format(phoneNumArr));
+			}
+		} catch (NullPointerException e) {
+
+		}
+
+
+		TextView body = msgView.findViewById(R.id.MsgBody);
+		body.setText(msg.getMsg());
 
 		int overlayParam = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
 		if (Build.VERSION.SDK_INT >= 26) {

@@ -57,6 +57,7 @@ public class BtTransferService extends Service {
 	private BtTransferService.ConnectedThread mConnectedThread;
 	private int mState;
 	private int mNewState;
+	private int failedConnects = 0;
 
 	// Constants that indicate the current connection state
 	public static final int STATE_NONE = 0;
@@ -93,6 +94,7 @@ public class BtTransferService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent == null || intent.getAction() == null) {
+			Log.d("Start", "here");
 			connectionRestart();
 			return START_STICKY;
 		}
@@ -253,11 +255,15 @@ public class BtTransferService extends Service {
 	// Indicate that the connection attempt failed
 	protected void connectFailed() {
 		mState = STATE_NONE;
-		//ToDo: wait before reattempting to connect
-		try {
-			Thread.sleep(2000);
-		} catch (Exception e) {}
-		connectByPref();
+		failedConnects++;
+		if (failedConnects < 3) {
+			//ToDo: wait before reattempting to connect
+			try {
+				Thread.sleep(2000);
+			} catch (Exception e) {}
+			connectByPref();
+		}
+
 	}
 
 	// Indicate that the connection was lost
@@ -385,6 +391,7 @@ public class BtTransferService extends Service {
 				mConnectThread = null;
 			}
 
+			failedConnects = 0;
 			connected(mmSocket, mmDevice);
 		}
 

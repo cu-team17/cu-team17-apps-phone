@@ -24,8 +24,11 @@ public class SMSTransferItem extends BtTransferItem implements Serializable {
 		return phoneNumber;
 	}
 
-	//ToDo: set name based off contacts
-	public String name() {
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
 		return name;
 	}
 }

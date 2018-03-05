@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void writeBT(View view) {
-		SMSTransferItem msg = new SMSTransferItem("This is my Test message!!!?", "3035550303");
+		SMSTransferItem msg = new SMSTransferItem("connected", null);
 
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
 		intent.setAction(PhoneBtTransferService.BT_WRITE);

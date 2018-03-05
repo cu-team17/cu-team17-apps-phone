@@ -109,6 +109,9 @@ public class BtFindDeviceActivity extends Activity {
 		}
 
 		mBtAdapter.startDiscovery();
+
+		//Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+		//startActivityForResult(discoverableIntent, 12332);
 	}
 
 	private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
