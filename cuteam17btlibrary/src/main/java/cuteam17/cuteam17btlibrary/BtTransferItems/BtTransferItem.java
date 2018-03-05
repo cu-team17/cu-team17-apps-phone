@@ -1,4 +1,4 @@
-package cuteam17.cuteam17phone.BtTransferItems;
+package cuteam17.cuteam17btlibrary.BtTransferItems;
 
 import java.io.Serializable;
 

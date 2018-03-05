@@ -1,4 +1,4 @@
-package cuteam17.cuteam17phone;
+package cuteam17.cuteam17rpi;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,14 +6,13 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import cuteam17.cuteam17phone.BtTransferItems.SMSTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 
 public class OverlayActivity extends AppCompatActivity {
 

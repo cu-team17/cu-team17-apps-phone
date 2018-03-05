@@ -1,4 +1,4 @@
-package cuteam17.cuteam17phone;
+package cuteam17.cuteam17rpi;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -34,18 +34,6 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		/*
-		//ToDo: temp fix
-		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-		Boolean deviceType = prefs.getBoolean("Device_Type", false);
-		if (!deviceType) {
-			if (Build.VERSION.SDK_INT >= 26) {
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putBoolean("Device_Type", true);
-				editor.apply();
-			}
-		}*/
 
 		establishPermissions();
 
@@ -86,30 +74,30 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void startBT(View view) {
-		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(PhoneBtTransferService.BT_START);
+		Intent intent = new Intent(this, RpiBtTransferService.class);
+		intent.setAction(RpiBtTransferService.BT_START);
 		startService(intent);
 	}
 
 	public void connectBT(View view) {
-		Intent intent = new Intent(this, PhoneBtTransferService.class);
+		Intent intent = new Intent(this, RpiBtTransferService.class);
 		intent.setAction(BtTransferService.BT_CONNECT);
 		startService(intent);
 	}
 
 	public void stopBT(View view) {
-		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(PhoneBtTransferService.BT_STOP);
+		Intent intent = new Intent(this, RpiBtTransferService.class);
+		intent.setAction(RpiBtTransferService.BT_STOP);
 		startService(intent);
 	}
 
 	public void writeBT(View view) {
 		SMSTransferItem msg = new SMSTransferItem("This is my msgdddd!!!", "3035550303");
 
-		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(PhoneBtTransferService.BT_WRITE);
+		Intent intent = new Intent(this, RpiBtTransferService.class);
+		intent.setAction(RpiBtTransferService.BT_WRITE);
 		Bundle bundle = new Bundle();
-		bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, msg);
+		bundle.putSerializable(RpiBtTransferService.INTENT_EXTRA_WRITE, msg);
 		intent.putExtras(bundle);
 		startService(intent);
 	}
@@ -189,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
 					//ToDo: messaging permission granted
 				} else {
 					//ToDo: no messaging permission
-				break;
-			}
+					break;
+				}
 			case Manifest.permission.READ_PHONE_STATE:
 				if (grantResult == PackageManager.PERMISSION_GRANTED) {
 					//ToDo: phone permission granted

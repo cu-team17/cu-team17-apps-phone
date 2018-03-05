@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CU Team17 Bt Library</string>
+
+    <string name="bt_find_device_title">Select the Bluetooth device to connect</string>
+    <string name="bt_find_device_paired_devices">Paired devices</string>
+    <string name="bt_find_device_no_paired_devices">No paired devices</string>
+    <string name="bt_find_device_new_devices">Other devices</string>
+    <string name="bt_find_device_no_new_devices">No devices found</string>
+    <string name="bt_find_device_scan">Pair new device</string>
+</resources>

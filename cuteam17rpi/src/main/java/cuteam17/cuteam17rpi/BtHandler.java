@@ -1,4 +1,4 @@
-package cuteam17.cuteam17phone;
+package cuteam17.cuteam17rpi;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.os.Looper;
 import android.os.Message;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,6 +52,11 @@ public class BtHandler extends Handler {
 			return;
 			//ToDo: do nothing on the msg
 		}
+		Intent overlay = new Intent(mContext, OverlayActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(OverlayActivity.INTENT_EXTRA, item);
+		overlay.putExtras(bundle);
+		mContext.startActivity(overlay);
 	}
 
 	private ObjectInputStream getObjectInputStream(Message msg) {

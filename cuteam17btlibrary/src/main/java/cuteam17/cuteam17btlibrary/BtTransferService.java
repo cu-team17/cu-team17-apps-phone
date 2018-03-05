@@ -1,4 +1,4 @@
-package cuteam17.cuteam17phone;
+package cuteam17.cuteam17btlibrary;
 
 /*
  * Copyright (C) 2014 The Android Open Source Project
@@ -39,7 +39,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import cuteam17.cuteam17phone.BtTransferItems.BtTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
 
 public class BtTransferService extends Service {
 
@@ -77,8 +77,6 @@ public class BtTransferService extends Service {
 
 	public static final String INTENT_EXTRA_WRITE = "EXTRA";
 
-	//private BtHandler mHandler;
-
 	public BtTransferService() {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
@@ -88,12 +86,6 @@ public class BtTransferService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		Log.d("Start", "service");
-		HandlerThread thread = new HandlerThread("Thread name", android.os.Process.THREAD_PRIORITY_BACKGROUND);
-		thread.start();
-		Looper looper = thread.getLooper();
-		mHandler = new BtHandler(this, looper);
 	}
 
 	@Override
@@ -125,6 +117,7 @@ public class BtTransferService extends Service {
 				break;
 			case BtTransferService.BT_WRITE:
 				try {
+					Log.d("no", "why");
 					BtTransferItem item = (BtTransferItem) intent.getExtras().getSerializable(INTENT_EXTRA_WRITE);
 					write(item, item.type.header);
 				} catch (Exception e) {
@@ -141,6 +134,10 @@ public class BtTransferService extends Service {
 	public IBinder onBind(Intent intent) {
 		// TODO: Return the communication channel to the service.
 		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	public void setHandler(Handler mHandler) {
+		this.mHandler = mHandler;
 	}
 
 	public synchronized int getState() {

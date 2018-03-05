@@ -8,7 +8,8 @@ import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-import cuteam17.cuteam17phone.BtTransferItems.SMSTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferService;
 
 public class MessageBroadcastReceiver extends BroadcastReceiver {
 
@@ -26,12 +27,12 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 				//Log.d("Msg", msgs[i].getOriginatingAddress() + " " + msgs[i].getMessageBody());
 				SMSTransferItem msg = new SMSTransferItem(msgs[i].getMessageBody(), msgs[i].getOriginatingAddress());
 
-				Intent btIntent = new Intent(context, BtTransferService.class);
-				btIntent.setAction(BtTransferService.BT_WRITE);
+				Intent btIntent = new Intent(context, PhoneBtTransferService.class);
+				btIntent.setAction(PhoneBtTransferService.BT_WRITE);
 				Bundle bundle = new Bundle();
-				bundle.putSerializable(BtTransferService.INTENT_EXTRA_WRITE, msg);
+				bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, msg);
 				btIntent.putExtras(bundle);
-				context.startService(intent);
+				context.startService(btIntent);
 			}
 
 		} else if (intent.getAction().equals("android.provider.Telephony.WAP_PUSH_RECEIVED")) {
