@@ -35,18 +35,24 @@ public class OverlayActivity extends AppCompatActivity {
 		LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		msgView = vi.inflate(R.layout.transfer_sms_message, null);
 
-		try {
-			String rawPhoneNumber = msg.getPhoneNumber();
-			if (rawPhoneNumber != null) {
-				TextView header = msgView.findViewById(R.id.MsgHeaderText);
-				java.text.MessageFormat phoneNumberFmt = new java.text.MessageFormat("({0})-{1}-{2}");
-				String[] phoneNumArr={rawPhoneNumber.substring(0, 3),
-						rawPhoneNumber.substring(3,6),
-						rawPhoneNumber.substring(6)};
-				header.setText(phoneNumberFmt.format(phoneNumArr));
-			}
-		} catch (NullPointerException e) {
+		String msgName = msg.getName();
+		if (msgName != null && !msgName.isEmpty()) {
+			TextView header = msgView.findViewById(R.id.MsgHeaderText);
+			header.setText(msgName);
+		} else {
+			try {
+				String rawPhoneNumber = msg.getPhoneNumber();
+				if (rawPhoneNumber != null) {
+					TextView header = msgView.findViewById(R.id.MsgHeaderText);
+					java.text.MessageFormat phoneNumberFmt = new java.text.MessageFormat("({0})-{1}-{2}");
+					String[] phoneNumArr={rawPhoneNumber.substring(0, 3),
+							rawPhoneNumber.substring(3,6),
+							rawPhoneNumber.substring(6)};
+					header.setText(phoneNumberFmt.format(phoneNumArr));
+				}
+			} catch (NullPointerException e) {
 
+			}
 		}
 
 

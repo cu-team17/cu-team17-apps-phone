@@ -73,32 +73,9 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	public void startBT(View view) {
-		Intent intent = new Intent(this, RpiBtTransferService.class);
-		intent.setAction(RpiBtTransferService.BT_START);
-		startService(intent);
-	}
-
-	public void connectBT(View view) {
+	public void connectBT() {
 		Intent intent = new Intent(this, RpiBtTransferService.class);
 		intent.setAction(BtTransferService.BT_CONNECT);
-		startService(intent);
-	}
-
-	public void stopBT(View view) {
-		Intent intent = new Intent(this, RpiBtTransferService.class);
-		intent.setAction(RpiBtTransferService.BT_STOP);
-		startService(intent);
-	}
-
-	public void writeBT(View view) {
-		SMSTransferItem msg = new SMSTransferItem("This is my msgdddd!!!", "3035550303");
-
-		Intent intent = new Intent(this, RpiBtTransferService.class);
-		intent.setAction(RpiBtTransferService.BT_WRITE);
-		Bundle bundle = new Bundle();
-		bundle.putSerializable(RpiBtTransferService.INTENT_EXTRA_WRITE, msg);
-		intent.putExtras(bundle);
 		startService(intent);
 	}
 
@@ -114,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 						editor.putString("BT_Connected_Device", btDeviceAdr);
 						editor.apply();
 
-						connectBT(null);
+						connectBT();
 					} catch (NullPointerException e) {
 						return;
 					}

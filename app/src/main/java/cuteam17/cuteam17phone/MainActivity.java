@@ -71,24 +71,28 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	//ToDo: remove just for testing
 	public void startBT(View view) {
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
 		intent.setAction(PhoneBtTransferService.BT_START);
 		startService(intent);
 	}
 
+	//ToDo: remove just for testing
 	public void connectBT(View view) {
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
 		intent.setAction(BtTransferService.BT_CONNECT);
 		startService(intent);
 	}
 
+	//ToDo: remove just for testing
 	public void stopBT(View view) {
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
 		intent.setAction(PhoneBtTransferService.BT_STOP);
 		startService(intent);
 	}
 
+	//ToDo: remove, just for testing
 	public void writeBT(View view) {
 		SMSTransferItem msg = new SMSTransferItem("connected", null);
 
@@ -101,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		//ToDo: add overlays permission request result
 		switch (requestCode) {
 			case REQUEST_CODE_DEVICE_LIST_ACTIVITY:
 				if (resultCode == RESULT_OK) {

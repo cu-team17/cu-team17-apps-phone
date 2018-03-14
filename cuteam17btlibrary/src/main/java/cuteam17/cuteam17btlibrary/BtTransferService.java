@@ -56,7 +56,6 @@ public class BtTransferService extends Service {
 	private BtTransferService.ConnectThread mConnectThread;
 	private BtTransferService.ConnectedThread mConnectedThread;
 	private int mState;
-	private int mNewState;
 	private int failedConnects = 0;
 
 	// Constants that indicate the current connection state
@@ -78,7 +77,6 @@ public class BtTransferService extends Service {
 	public BtTransferService() {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
-		mNewState = mState;
 	}
 
 	@Override
@@ -94,7 +92,7 @@ public class BtTransferService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent == null || intent.getAction() == null) {
-			Log.d("Start", "here");
+			Log.d(TAG, "connection restart");
 			connectionRestart();
 			return START_STICKY;
 		}

@@ -27,9 +27,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="#121212"
+                android:textColor="#ffffff"
                 android:textSize="24sp"
-                android:text="Bluetooth" />
+                android:text="test"/>
 
             <View
                 android:layout_width="match_parent"
@@ -48,7 +48,7 @@
             android:paddingEnd="40dp"
             android:paddingTop="2dp"
             android:paddingBottom="15dp"
-            android:textColor="#121212"
+            android:textColor="#ffffff"
             android:textSize="24sp"
             android:text="This is a message to transfer"/>
 
