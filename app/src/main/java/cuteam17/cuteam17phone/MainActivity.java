@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -24,60 +25,61 @@ import cuteam17.cuteam17btlibrary.BtTransferService;
 
 public class MainActivity extends AppCompatActivity {
 
+	private static final int REQUEST_MESSAGE_PERMISSIONS = 200;
+	private static final int REQUEST_PHONE_PERMISSIONS = 210;
 	private static final int REQUEST_CODE_PERMISSIONS_LIST = 101;
 	private static final int REQUEST_CODE_DEVICE_LIST_ACTIVITY = 105;
 	private static final int REQUEST_ENABLE_BLUETOOTH = 110;
 
-	private static final String TRANSFER_MESSAGE_PREF = "TRANSFER_MESSAGE_PREF";
-	private static final String TRANSFER_NOTIFICATIONS_PREF = "TRANSFER_NOTIFICATIONS_PREF";
-	private static final String TRANSFER_PHONE_PREF = "TRANSFER_PHONE_PREF";
-
 	private BluetoothAdapter mBluetoothAdapter;
+
+	private PreferenceManager prefs = new PreferenceManager(this);
 
 	private final CompoundButton.OnCheckedChangeListener notificationSwitchListener = new CompoundButton.OnCheckedChangeListener() {
 		@Override
-		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
 			if (isChecked) {
 				if (!notificationListenerEnabled()) {
+					view.setChecked(false);
 					Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
 					startActivity(intent);
 				} else {
-					//ToDo: enable sending notifications in prefs
+					prefs.setNotificationPref(true);
 				}
 			} else {
-				
+				prefs.setNotificationPref(false);
 			}
 		}
 	};
 
 	private final CompoundButton.OnCheckedChangeListener messageSwitchListener = new CompoundButton.OnCheckedChangeListener() {
 		@Override
-		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
 			if (isChecked) {
-				if (!notificationListenerEnabled()) {
-					Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-					startActivity(intent);
+				if (checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+					requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_CONTACTS}, REQUEST_MESSAGE_PERMISSIONS);
+					view.setChecked(false);
 				} else {
-					//ToDo: enable sending notifications in prefs
+					prefs.setMessagePref(true);
 				}
 			} else {
-				//ToDo: disable sending notifications in prefs
+				prefs.setMessagePref(false);
 			}
 		}
 	};
 
 	private final CompoundButton.OnCheckedChangeListener phoneSwitchListener = new CompoundButton.OnCheckedChangeListener() {
 		@Override
-		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
 			if (isChecked) {
-				if (!notificationListenerEnabled()) {
-					Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-					startActivity(intent);
+				if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+					requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_CONTACTS}, REQUEST_PHONE_PERMISSIONS);
+					view.setChecked(false);
 				} else {
-					//ToDo: enable sending notifications in prefs
+					prefs.setPhonePref(true);
 				}
 			} else {
-				//ToDo: disable sending notifications in prefs
+				prefs.setPhonePref(false);
 			}
 		}
 	};
@@ -87,23 +89,13 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		establishPermissions();
-
-		setupSwitches();
-
-		/*
-		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
-		if (btDeviceAdr != null) {
-			// bluetooth setup
-		}
-		*/
-
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
 			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
 			finish();
 		}
+
+		setupSwitches();
 	}
 
 	private boolean notificationListenerEnabled() {
@@ -211,55 +203,46 @@ public class MainActivity extends AppCompatActivity {
 		switch (requestCode) {
 			case REQUEST_CODE_PERMISSIONS_LIST:
 				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
-					permissionResult(permissions[i],grantResults[i]);
+					//permissionResult(permissions[i],grantResults[i]);
 				}
 				break;
-		}
-	}
-
-	private void permissionResult(String permission, int grantResult) {
-		switch (permission) {
-			case Manifest.permission.RECEIVE_SMS:
-				if (grantResult == PackageManager.PERMISSION_GRANTED) {
-					//ToDo: messaging permission granted
-				} else {
-					//ToDo: no messaging permission
-				break;
-			}
-			case Manifest.permission.READ_PHONE_STATE:
-				if (grantResult == PackageManager.PERMISSION_GRANTED) {
-					//ToDo: phone permission granted
-				} else {
-					//ToDo: no phone permission
+			case REQUEST_MESSAGE_PERMISSIONS:
+				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
+					if (permissions[i].equals(Manifest.permission.RECEIVE_SMS) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+						Log.d("MSG", "Pref");
+						prefs.setMessagePref(true);
+						//ToDo: switch on
+					}
 				}
 				break;
-			case Manifest.permission.READ_CONTACTS:
-				if (grantResult == PackageManager.PERMISSION_GRANTED) {
-					//ToDo: contacts permission granted
-				} else {
-					//ToDo: no contacts permission
+			case REQUEST_PHONE_PERMISSIONS:
+				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
+					if (permissions[i].equals(Manifest.permission.READ_PHONE_STATE) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+						prefs.setPhonePref(true);
+						Log.d("Phone", "Pref");
+						//ToDo: switch on
+					}
 				}
-				break;
 		}
 	}
 
 	private void setupSwitches() {
-		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+		PreferenceManager prefs = new PreferenceManager(this);
 
 		Switch messageSwitch = findViewById(R.id.message_switch);
-		if (checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED && prefs.getBoolean(TRANSFER_MESSAGE_PREF, false)) {
+		if (checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED && prefs.getMessagePref()) {
 			messageSwitch.setChecked(true);
 		}
 		messageSwitch.setOnCheckedChangeListener(messageSwitchListener);
 
 		Switch notificationSwitch = findViewById(R.id.notification_switch);
-		if (notificationListenerEnabled() && prefs.getBoolean(TRANSFER_NOTIFICATIONS_PREF, false)) {
+		if (notificationListenerEnabled() && prefs.getNotificationPref()) {
 			notificationSwitch.setChecked(true);
 		}
 		notificationSwitch.setOnCheckedChangeListener(notificationSwitchListener);
 
 		Switch phoneSwitch = findViewById(R.id.phone_call_switch);
-		if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && prefs.getBoolean(TRANSFER_PHONE_PREF, false)) {
+		if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && prefs.getPhonePref()) {
 			phoneSwitch.setChecked(true);
 		}
 		phoneSwitch.setOnCheckedChangeListener(phoneSwitchListener);
