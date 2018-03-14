@@ -13,7 +13,7 @@ public class PhoneBtTransferService extends BtTransferService {
 		HandlerThread thread = new HandlerThread("Thread name", android.os.Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 		Looper looper = thread.getLooper();
-		setHandler(new BtHandler(this, looper));
+		setHandler(new PhoneBtHandler(this, looper));
 	}
 
 	protected void connectionRestart() {

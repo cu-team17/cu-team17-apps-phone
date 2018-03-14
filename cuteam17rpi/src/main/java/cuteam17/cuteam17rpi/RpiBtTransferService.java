@@ -1,8 +1,5 @@
 package cuteam17.cuteam17rpi;
 
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.HandlerThread;
 import android.os.Looper;
 
@@ -16,7 +13,7 @@ public class RpiBtTransferService extends BtTransferService {
 		HandlerThread thread = new HandlerThread("Thread name", android.os.Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 		Looper looper = thread.getLooper();
-		setHandler(new BtHandler(this, looper));
+		setHandler(new RpiBtHandler(this, looper));
 	}
 
 	protected void connectionRestart() {

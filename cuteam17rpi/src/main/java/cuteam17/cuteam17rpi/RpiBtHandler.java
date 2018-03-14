@@ -1,4 +1,4 @@
-package cuteam17.cuteam17phone;
+package cuteam17.cuteam17rpi;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.os.Looper;
 import android.os.Message;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,11 +15,11 @@ import java.io.ObjectInputStream;
 import cuteam17.cuteam17btlibrary.BtOperations;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 
-public class BtHandler extends Handler {
+public class RpiBtHandler extends Handler {
 
 	private Context mContext;
 
-	public BtHandler(Context context, Looper looper) {
+	public RpiBtHandler(Context context, Looper looper) {
 		super(looper);
 		mContext = context;
 	}
@@ -53,6 +52,11 @@ public class BtHandler extends Handler {
 			return;
 			//ToDo: do nothing on the msg
 		}
+		Intent overlay = new Intent(mContext, OverlayActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(OverlayActivity.INTENT_EXTRA, item);
+		overlay.putExtras(bundle);
+		mContext.startActivity(overlay);
 	}
 
 	private ObjectInputStream getObjectInputStream(Message msg) {

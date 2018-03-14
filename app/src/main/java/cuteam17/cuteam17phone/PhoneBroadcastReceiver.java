@@ -11,10 +11,12 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 
-public class MessageBroadcastReceiver extends BroadcastReceiver {
+public class PhoneBroadcastReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -31,6 +33,7 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 				String msgBody = msg.getMessageBody();
 				String msgAddress = msg.getOriginatingAddress();
 				String msgName = getContactName(context, msgAddress);
+
 				msgToTransfer = (msgName != null && !msgName.isEmpty()) ? new SMSTransferItem(msgBody, msgAddress, msgName) : new SMSTransferItem(msgBody, msgAddress);
 
 				Intent btIntent = new Intent(context, PhoneBtTransferService.class);
@@ -41,11 +44,24 @@ public class MessageBroadcastReceiver extends BroadcastReceiver {
 				context.startService(btIntent);
 			}
 
-		} else if (intent.getAction().equals("android.provider.Telephony.WAP_PUSH_RECEIVED")) {
+		} else if (intentAction.equals("android.provider.Telephony.WAP_PUSH_RECEIVED")) {
 			//ToDO: handle mms body
 			Bundle extras = intent.getExtras();
-			String s = new String((byte[])extras.get("header"));
-		}
+			//String s = new String((byte[])extras.get("header"));
+		} else if (intentAction.equals("android.intent.action.PHONE_STATE")) {
+			String stateExtra = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
+			String stateNumber = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+			if (stateExtra.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+				Log.d("Call", "Idle");
+			} else if (stateExtra.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+				Log.d("Call", "Offhook");
+			} else if (stateExtra.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+				Log.d("Call", "Ringing");
+			}
+
+		}/* else if (intentAction.equals("android.intent.action.NEW_OUTGOING_CALL")) {
+			Log.d("Call", "Outgoing");
+		}*/
 
 	}
 

@@ -59,10 +59,8 @@ public class OverlayActivity extends AppCompatActivity {
 		TextView body = msgView.findViewById(R.id.MsgBody);
 		body.setText(msg.getMsg());
 
-		int overlayParam = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
-		if (Build.VERSION.SDK_INT >= 26) {
-			overlayParam = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-		}
+		int overlayParam = (Build.VERSION.SDK_INT >= 26) ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
+
 		WindowManager.LayoutParams params = new WindowManager.LayoutParams(
 				WindowManager.LayoutParams.WRAP_CONTENT,
 				WindowManager.LayoutParams.WRAP_CONTENT,
