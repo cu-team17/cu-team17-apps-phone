@@ -7,12 +7,14 @@ import android.os.Looper;
 import android.os.Message;
 
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import cuteam17.cuteam17btlibrary.BtOperations;
+import cuteam17.cuteam17btlibrary.BtTransferItems.NotificationTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 
 public class RpiBtHandler extends Handler {
@@ -33,6 +35,9 @@ public class RpiBtHandler extends Handler {
 					//ToDo: change to use header from TransferItemType
 					case 49:
 						handleSMS(msg);
+						break;
+					case 52:
+						handleNotification(msg);
 						break;
 				}
 				break;
@@ -57,6 +62,17 @@ public class RpiBtHandler extends Handler {
 		bundle.putSerializable(OverlayActivity.INTENT_EXTRA, item);
 		overlay.putExtras(bundle);
 		mContext.startActivity(overlay);
+	}
+
+	private void handleNotification(Message msg) {
+		ObjectInputStream objectStream = getObjectInputStream(msg);
+		NotificationTransferItem item;
+		try {
+			item = (NotificationTransferItem) objectStream.readObject();
+		} catch (Exception e) {
+			return;
+		}
+		Log.d("Really this worked", item.getPackageName());
 	}
 
 	private ObjectInputStream getObjectInputStream(Message msg) {
