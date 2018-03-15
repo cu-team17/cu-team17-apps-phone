@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
 	private static final int REQUEST_MESSAGE_PERMISSIONS = 200;
 	private static final int REQUEST_PHONE_PERMISSIONS = 210;
-	private static final int REQUEST_CODE_PERMISSIONS_LIST = 101;
-	private static final int REQUEST_CODE_DEVICE_LIST_ACTIVITY = 105;
+	private static final int REQUEST_LOCATION_PERMISSIONS = 220;
+	private static final int REQUEST_CODE_DEVICE_LIST_ACTIVITY = 100;
 	private static final int REQUEST_ENABLE_BLUETOOTH = 110;
 
 	private BluetoothAdapter mBluetoothAdapter;
@@ -40,15 +40,13 @@ public class MainActivity extends AppCompatActivity {
 		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
 			if (isChecked) {
 				if (!notificationListenerEnabled()) {
-					view.setChecked(false);
 					Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
 					startActivity(intent);
-				} else {
-					prefs.setNotificationPref(true);
+					view.setChecked(false);
+					return;
 				}
-			} else {
-				prefs.setNotificationPref(false);
 			}
+			prefs.setNotificationPref(isChecked);
 		}
 	};
 
@@ -59,12 +57,10 @@ public class MainActivity extends AppCompatActivity {
 				if (checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
 					requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_CONTACTS}, REQUEST_MESSAGE_PERMISSIONS);
 					view.setChecked(false);
-				} else {
-					prefs.setMessagePref(true);
+					return;
 				}
-			} else {
-				prefs.setMessagePref(false);
 			}
+			prefs.setMessagePref(isChecked);
 		}
 	};
 
@@ -73,15 +69,14 @@ public class MainActivity extends AppCompatActivity {
 		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
 			if (isChecked) {
 				if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-					requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_CONTACTS}, REQUEST_PHONE_PERMISSIONS);
+					requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CONTACTS}, REQUEST_PHONE_PERMISSIONS);
 					view.setChecked(false);
-				} else {
-					prefs.setPhonePref(true);
+					return;
 				}
-			} else {
-				prefs.setPhonePref(false);
 			}
+			prefs.setPhonePref(isChecked);
 		}
+
 	};
 
 	@Override
@@ -98,19 +93,17 @@ public class MainActivity extends AppCompatActivity {
 		setupSwitches();
 	}
 
-	private boolean notificationListenerEnabled() {
-		ComponentName cn = new ComponentName(this, NotificationListener.class);
-		String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
-		return flat != null && flat.contains(cn.flattenToString());
-	}
-
 	public void setupBluetooth(View view) {
-		if (!mBluetoothAdapter.isEnabled()) {
-			Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
+		if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSIONS);
 		} else {
-			Intent serverIntent = new Intent(this, BtFindDeviceActivity.class);
-			startActivityForResult(serverIntent, REQUEST_CODE_DEVICE_LIST_ACTIVITY);
+			if (!mBluetoothAdapter.isEnabled()) {
+				Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
+			} else {
+				Intent serverIntent = new Intent(this, BtFindDeviceActivity.class);
+				startActivityForResult(serverIntent, REQUEST_CODE_DEVICE_LIST_ACTIVITY);
+			}
 		}
 	}
 
@@ -130,9 +123,9 @@ public class MainActivity extends AppCompatActivity {
 
 	//ToDo: remove just for testing
 	public void stopBT(View view) {
-		//Intent intent = new Intent(this, PhoneBtTransferService.class);
-		//intent.setAction(PhoneBtTransferService.BT_STOP);
-		//startService(intent);
+		Intent intent = new Intent(this, PhoneBtTransferService.class);
+		intent.setAction(PhoneBtTransferService.BT_STOP);
+		startService(intent);
 	}
 
 	//ToDo: remove, just for testing
@@ -176,51 +169,30 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	private boolean establishPermissions() {
-		List<String> permissionsList = new ArrayList<String>();
-
-		addPermissionToList(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION);
-		addPermissionToList(permissionsList, Manifest.permission.RECEIVE_SMS);
-		addPermissionToList(permissionsList, Manifest.permission.READ_PHONE_STATE);
-		addPermissionToList(permissionsList, Manifest.permission.READ_CONTACTS);
-
-		if (!permissionsList.isEmpty()) {
-			requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), REQUEST_CODE_PERMISSIONS_LIST);
-			return true;
-		}
-		return false;
-
-	}
-
-	private void addPermissionToList(List<String> permissionsList, String permission) {
-		if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-			permissionsList.add(permission);
-		}
-	}
-
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 		switch (requestCode) {
-			case REQUEST_CODE_PERMISSIONS_LIST:
+			case REQUEST_LOCATION_PERMISSIONS:
 				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
-					//permissionResult(permissions[i],grantResults[i]);
+					if (permissions[i].equals(Manifest.permission.ACCESS_COARSE_LOCATION) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+						//ToDO: possible better way of setting up bluetooth
+						setupBluetooth(null);
+					}
 				}
 				break;
 			case REQUEST_MESSAGE_PERMISSIONS:
 				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
 					if (permissions[i].equals(Manifest.permission.RECEIVE_SMS) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-						Log.d("MSG", "Pref");
-						prefs.setMessagePref(true);
-						//ToDo: switch on
+						Switch messageSwitch = findViewById(R.id.message_switch);
+						messageSwitch.setChecked(true);
 					}
 				}
 				break;
 			case REQUEST_PHONE_PERMISSIONS:
 				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
 					if (permissions[i].equals(Manifest.permission.READ_PHONE_STATE) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-						prefs.setPhonePref(true);
-						Log.d("Phone", "Pref");
-						//ToDo: switch on
+						Switch phoneSwitch = findViewById(R.id.phone_call_switch);
+						phoneSwitch.setChecked(true);
 					}
 				}
 		}
@@ -246,5 +218,11 @@ public class MainActivity extends AppCompatActivity {
 			phoneSwitch.setChecked(true);
 		}
 		phoneSwitch.setOnCheckedChangeListener(phoneSwitchListener);
+	}
+
+	private boolean notificationListenerEnabled() {
+		ComponentName cn = new ComponentName(this, NotificationListener.class);
+		String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
+		return flat != null && flat.contains(cn.flattenToString());
 	}
 }
