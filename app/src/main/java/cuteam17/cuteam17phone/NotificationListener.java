@@ -29,12 +29,14 @@ public class NotificationListener extends NotificationListenerService {
 		Bundle extras = notification.extras;
 
 		String title = extras.getString("android.title");
+		String titleBig = extras.getString("android.title.big");
 		String text = extras.getString("android.text");
 		Icon id = notification.getLargeIcon();
 		Log.d("newNot", pack);
 		//NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(this);
 		//mNotificationManager.notify(1, newNot);
 
+		/*
 		NotificationTransferItem notificationToTransfer = new NotificationTransferItem(pack, title, text);
 
 		Intent btIntent = new Intent(this, PhoneBtTransferService.class);
@@ -42,7 +44,7 @@ public class NotificationListener extends NotificationListenerService {
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, notificationToTransfer);
 		btIntent.putExtras(bundle);
-		startService(btIntent);
+		startService(btIntent);*/
 
 	}
 

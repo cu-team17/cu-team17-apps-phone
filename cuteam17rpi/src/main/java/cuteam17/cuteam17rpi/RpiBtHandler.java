@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import cuteam17.cuteam17btlibrary.BtOperations;
+import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.NotificationTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 
@@ -49,39 +50,41 @@ public class RpiBtHandler extends Handler {
 	}
 
 	private void handleSMS(Message msg) {
-		ObjectInputStream objectStream = getObjectInputStream(msg);
-		SMSTransferItem item;
-		try {
-			item = (SMSTransferItem) objectStream.readObject();
-		} catch (Exception e) {
-			return;
-			//ToDo: do nothing on the msg
+		SMSTransferItem item = deserializeMessageObject(msg, SMSTransferItem.class);
+		if (item != null) {
+			Intent overlay = new Intent(mContext, OverlayActivity.class);
+			Bundle bundle = new Bundle();
+			bundle.putSerializable(OverlayActivity.INTENT_EXTRA, item);
+			overlay.putExtras(bundle);
+			mContext.startActivity(overlay);
 		}
-		Intent overlay = new Intent(mContext, OverlayActivity.class);
-		Bundle bundle = new Bundle();
-		bundle.putSerializable(OverlayActivity.INTENT_EXTRA, item);
-		overlay.putExtras(bundle);
-		mContext.startActivity(overlay);
 	}
 
 	private void handleNotification(Message msg) {
-		ObjectInputStream objectStream = getObjectInputStream(msg);
-		NotificationTransferItem item;
-		try {
-			item = (NotificationTransferItem) objectStream.readObject();
-		} catch (Exception e) {
-			return;
+		NotificationTransferItem item = deserializeMessageObject(msg, NotificationTransferItem.class);
+		if (item != null) {
+			Log.d("Really this worked", item.getPackageName());
 		}
-		Log.d("Really this worked", item.getPackageName());
+
 	}
 
-	private ObjectInputStream getObjectInputStream(Message msg) {
+	private <T extends BtTransferItem> T deserializeMessageObject(Message msg, Class<T> type) {
+		Object returnObject;
 		try {
+			ObjectInputStream objectStream;
 			ByteArrayInputStream inputStream = new ByteArrayInputStream((byte[])msg.obj);
-			return new ObjectInputStream(inputStream);
+			objectStream = new ObjectInputStream(inputStream);
+			returnObject = objectStream.readObject();
 		} catch (IOException e) {
+			Log.e("BtHandler", "IOException");
+			return null;
 			//ToDo: handle exception
+		} catch (ClassNotFoundException e) {
+			Log.e("BtHandler", "ClassNotFoundException");
+			return null;
 		}
-		return null;
+
+		return type.cast(returnObject);
+
 	}
 }
