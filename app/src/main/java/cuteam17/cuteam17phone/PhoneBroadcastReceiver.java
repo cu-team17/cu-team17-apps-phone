@@ -24,7 +24,9 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 		String intentAction = intent.getAction();
 		if (intentAction == null) return;
 
-		if(intentAction.equals("android.provider.Telephony.SMS_RECEIVED")){
+		PreferenceManager prefs = new PreferenceManager(context);
+
+		if(intentAction.equals("android.provider.Telephony.SMS_RECEIVED") && prefs.getMessagePref()){
 
 			SmsMessage[] msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent);
 			for (SmsMessage msg: msgs) {
@@ -44,11 +46,12 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 				context.startService(btIntent);
 			}
 
-		} else if (intentAction.equals("android.provider.Telephony.WAP_PUSH_RECEIVED")) {
+		} else if (intentAction.equals("android.provider.Telephony.WAP_PUSH_RECEIVED") && prefs.getMessagePref()) {
 			//ToDO: handle mms body
 			Bundle extras = intent.getExtras();
 			//String s = new String((byte[])extras.get("header"));
-		} else if (intentAction.equals("android.intent.action.PHONE_STATE")) {
+
+		} else if (intentAction.equals("android.intent.action.PHONE_STATE") && prefs.getPhonePref()) {
 			String stateExtra = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
 			String stateNumber = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
 			if (stateExtra.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
