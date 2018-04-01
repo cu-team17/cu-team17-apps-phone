@@ -22,7 +22,7 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 
 	private Context context;
 
-	private int prevTelephoneState = TelephonyManager.CALL_STATE_IDLE;
+	private static int prevTelephoneState = TelephonyManager.CALL_STATE_IDLE;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {

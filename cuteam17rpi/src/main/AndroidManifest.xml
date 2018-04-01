@@ -25,7 +25,7 @@
         <activity android:name="cuteam17.cuteam17btlibrary.BtFindDeviceActivity" />
 
         <activity
-            android:name="cuteam17.cuteam17rpi.OverlayActivity"
+            android:name="cuteam17.cuteam17rpi.OverlayActivities.SMSOverlayActivity"
             android:theme="@android:style/Theme.NoDisplay" />
 
         <service

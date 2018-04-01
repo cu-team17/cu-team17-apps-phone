@@ -12,8 +12,6 @@ import android.util.Log;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Arrays;
-import java.util.List;
 
 import cuteam17.cuteam17btlibrary.BtOperations;
 import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
@@ -21,7 +19,10 @@ import cuteam17.cuteam17btlibrary.BtTransferItems.NotificationTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TelephoneTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TransferItemType;
+import cuteam17.cuteam17rpi.OverlayActivities.OverlayActivity;
+import cuteam17.cuteam17rpi.OverlayActivities.SMSOverlayActivity;
 
+//ToDo: make RpiBtHandler and PhoneBtHandler subclasses of a BtHandler class
 public class RpiBtHandler extends Handler {
 
 	private Context mContext;
@@ -33,8 +34,8 @@ public class RpiBtHandler extends Handler {
 
 	@Override
 	public void handleMessage(Message msg) {
-		BtOperations op = BtOperations.get(msg.what);
-		switch (op) {
+		BtOperations operation = BtOperations.get(msg.what);
+		switch (operation) {
 			case BT_READ:
 				TransferItemType type = TransferItemType.getByHeader(msg.arg1);
 				switch (type) {
@@ -50,8 +51,10 @@ public class RpiBtHandler extends Handler {
 				}
 				break;
 			case BT_WRITE:
+				// Potential implementation options after BluetoothTransferService writes to the bluetooth socket
 				break;
 			case BT_STATE_UPDATE:
+				// Potential implementation options for changes/updates in the state of BluetoothTransferService
 				break;
 		}
 	}
@@ -59,9 +62,9 @@ public class RpiBtHandler extends Handler {
 	private void handleSMS(Message msg) {
 		SMSTransferItem item = deserializeMessageObject(msg, SMSTransferItem.class);
 		if (item != null) {
-			Intent overlay = new Intent(mContext, OverlayActivity.class);
+			Intent overlay = new Intent(mContext, SMSOverlayActivity.class);
 			Bundle bundle = new Bundle();
-			bundle.putSerializable(OverlayActivity.INTENT_EXTRA, item);
+			bundle.putSerializable(OverlayActivity.BT_TRANSFER_ITEM_EXTRA, item);
 			overlay.putExtras(bundle);
 			mContext.startActivity(overlay);
 		}
