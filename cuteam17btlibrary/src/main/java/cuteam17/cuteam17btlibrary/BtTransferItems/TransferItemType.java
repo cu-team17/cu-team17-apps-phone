@@ -1,7 +1,10 @@
 package cuteam17.cuteam17btlibrary.BtTransferItems;
 
 public enum TransferItemType {
-	SMS(49), MMS(50), INCOMING_PHONE_CALL(51), NOTIFICATION(52);
+	SMS(49),
+	MMS(50),
+	INCOMING_PHONE_CALL(51),
+	NOTIFICATION(52);
 
 	public final char header;
 

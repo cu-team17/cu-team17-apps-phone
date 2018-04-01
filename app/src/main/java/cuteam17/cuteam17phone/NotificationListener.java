@@ -25,6 +25,7 @@ public class NotificationListener extends NotificationListenerService {
 	public void onNotificationPosted(StatusBarNotification sbn) {
 
 		PreferenceManager prefs = new PreferenceManager(this);
+
 		if (prefs.getNotificationPref()) {
 			String pack = sbn.getPackageName();
 			Notification notification = sbn.getNotification();
