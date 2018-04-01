@@ -12,11 +12,15 @@ import android.util.Log;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import cuteam17.cuteam17btlibrary.BtOperations;
 import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.NotificationTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferItems.TelephoneTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferItems.TransferItemType;
 
 public class RpiBtHandler extends Handler {
 
@@ -29,15 +33,18 @@ public class RpiBtHandler extends Handler {
 
 	@Override
 	public void handleMessage(Message msg) {
-		BtOperations op = BtOperations.values()[msg.what];
+		BtOperations op = BtOperations.get(msg.what);
 		switch (op) {
 			case BT_READ:
-				switch (msg.arg1) {
-					//ToDo: change to use header from TransferItemType
-					case 49:
+				TransferItemType type = TransferItemType.getByHeader(msg.arg1);
+				switch (type) {
+					case SMS:
 						handleSMS(msg);
 						break;
-					case 52:
+					case TELEPHONE_CALL:
+						handleTelephone(msg);
+						break;
+					case NOTIFICATION:
 						handleNotification(msg);
 						break;
 				}
@@ -58,6 +65,12 @@ public class RpiBtHandler extends Handler {
 			overlay.putExtras(bundle);
 			mContext.startActivity(overlay);
 		}
+	}
+
+	private void handleTelephone(Message msg) {
+		TelephoneTransferItem itme = deserializeMessageObject(msg, TelephoneTransferItem.class);
+		Intent i = new Intent("cuteam17.cuteam17btlibrary.Click");
+		mContext.sendBroadcast(i);
 	}
 
 	private void handleNotification(Message msg) {

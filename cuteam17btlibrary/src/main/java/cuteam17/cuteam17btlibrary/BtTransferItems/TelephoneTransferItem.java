@@ -6,11 +6,17 @@ public class TelephoneTransferItem extends BtTransferItem {
 
 	private int telephoneState;
 	private String phoneNumber;
+	private String contactName;
 
 	public TelephoneTransferItem(int telephoneState, String phoneNumber) {
-		super(TransferItemType.INCOMING_PHONE_CALL);
+		super(TransferItemType.TELEPHONE_CALL);
 		this.telephoneState = telephoneState;
 		this.phoneNumber = phoneNumber;
+	}
+
+	public TelephoneTransferItem(int telephoneState, String phoneNumber, String contactName) {
+		this(telephoneState, phoneNumber);
+		this.contactName = contactName;
 	}
 
 	public int getTelephoneState() {
@@ -19,5 +25,9 @@ public class TelephoneTransferItem extends BtTransferItem {
 
 	public String getPhoneNumber() {
 		return phoneNumber;
+	}
+
+	public String getContactName() {
+		return contactName;
 	}
 }

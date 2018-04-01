@@ -6,11 +6,9 @@ import java.io.Serializable;
 
 public class SMSTransferItem extends BtTransferItem implements Serializable {
 
-	//public TransferItemType type = TransferItemType.SMS;
-
 	private String msg;
 	private String phoneNumber;
-	private String name;
+	private String contactName;
 
 	public SMSTransferItem(String msg, String phoneNumber) {
 		super(TransferItemType.SMS);
@@ -18,9 +16,9 @@ public class SMSTransferItem extends BtTransferItem implements Serializable {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public SMSTransferItem(String msg, String phoneNumber, String name) {
+	public SMSTransferItem(String msg, String phoneNumber, String contactName) {
 		this(msg,phoneNumber);
-		this.name = name;
+		this.contactName = contactName;
 	}
 
 	public String getMsg() {
@@ -31,7 +29,7 @@ public class SMSTransferItem extends BtTransferItem implements Serializable {
 		return phoneNumber;
 	}
 
-	public String getName() {
-		return name;
+	public String getContactName() {
+		return contactName;
 	}
 }

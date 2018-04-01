@@ -35,13 +35,11 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 		if(intentAction.equals("android.provider.Telephony.SMS_RECEIVED") && prefs.getMessagePref()){
 			SmsMessage[] msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent);
 			for (SmsMessage msg: msgs) {
-				SMSTransferItem msgToTransfer;
-
 				String msgBody = msg.getMessageBody();
 				String msgAddress = msg.getOriginatingAddress();
-				String msgName = getContactName(msgAddress);
+				String msgContactName = getContactName(msgAddress);
 
-				msgToTransfer = (msgName != null && !msgName.isEmpty()) ? new SMSTransferItem(msgBody, msgAddress, msgName) : new SMSTransferItem(msgBody, msgAddress);
+				SMSTransferItem msgToTransfer = new SMSTransferItem(msgBody, msgAddress, msgContactName);
 
 				startTransferServiceWithExtra(msgToTransfer);
 			}
@@ -112,14 +110,14 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 		switch (state) {
 			case TelephonyManager.CALL_STATE_RINGING:
 				// Incoming call
-				startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber));
+				startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber, getContactName(phoneNumber)));
 				Log.d("Phone", "incoming");
 				break;
 
 			case TelephonyManager.CALL_STATE_OFFHOOK:
 				if (prevTelephoneState == TelephonyManager.CALL_STATE_RINGING) {
 					// Incoming call answered
-					startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber));
+					startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber, getContactName(phoneNumber)));
 					Log.d("Phone", "incoming answered");
 				} else {
 					Log.d("Phone", "outgoing");
@@ -129,7 +127,7 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 			case TelephonyManager.CALL_STATE_IDLE:
 				if (prevTelephoneState == TelephonyManager.CALL_STATE_RINGING) {
 					// Incoming call missed
-					startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber));
+					startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber, getContactName(phoneNumber)));
 					Log.d("Phone", "incoming missed");
 				} else {
 					// Incoming or Outgoing call ended
