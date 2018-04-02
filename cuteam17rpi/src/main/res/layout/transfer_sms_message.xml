@@ -29,7 +29,7 @@
                 android:layout_weight="1"
                 android:textColor="#ffffff"
                 android:textSize="24sp"
-                android:text="test"/>
+                android:text="Bluetooth"/>
 
             <View
                 android:layout_width="match_parent"

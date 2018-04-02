@@ -71,7 +71,7 @@ public class RpiBtHandler extends Handler {
 	}
 
 	private void handleTelephone(Message msg) {
-		TelephoneTransferItem itme = deserializeMessageObject(msg, TelephoneTransferItem.class);
+		TelephoneTransferItem item = deserializeMessageObject(msg, TelephoneTransferItem.class);
 		Intent i = new Intent("cuteam17.cuteam17btlibrary.Click");
 		mContext.sendBroadcast(i);
 	}
@@ -84,6 +84,7 @@ public class RpiBtHandler extends Handler {
 
 	}
 
+	// Deserialize input message obj to the specified type
 	private <T extends BtTransferItem> T deserializeMessageObject(Message msg, Class<T> type) {
 		Object returnObject;
 		try {

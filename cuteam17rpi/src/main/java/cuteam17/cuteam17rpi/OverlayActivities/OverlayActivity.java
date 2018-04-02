@@ -33,7 +33,7 @@ public abstract class OverlayActivity extends AppCompatActivity {
 		params.setTitle("Message");
 
 		WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-		wm.addView(overlayView, params);
+		wm.addView(this.overlayView, params);
 	}
 
 	protected void removeOverlayView() {

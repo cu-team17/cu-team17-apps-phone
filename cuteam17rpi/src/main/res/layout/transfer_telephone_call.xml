@@ -1,0 +1,62 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00ffffff">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:padding="15dp"
+        android:background="@drawable/transfer_sms_background"
+        android:layout_marginTop="30dp" >
+
+        <TextView
+            android:id="@+id/telephone_call_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:textColor="#ffffff"
+            android:textSize="35sp"
+            android:text="Incoming Call"/>
+
+        <TextView
+            android:id="@+id/caller_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/telephone_call_header"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="65dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:textColor="#ffffff"
+            android:textSize="23sp"
+            android:text="Unknown"/>
+
+        <TextView
+            android:id="@+id/caller_id_extra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/caller_id"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:visibility="gone"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>
