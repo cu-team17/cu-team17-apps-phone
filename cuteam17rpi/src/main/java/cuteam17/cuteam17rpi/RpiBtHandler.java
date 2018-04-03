@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import android.os.Handler;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -21,6 +22,7 @@ import cuteam17.cuteam17btlibrary.BtTransferItems.TelephoneTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TransferItemType;
 import cuteam17.cuteam17rpi.OverlayActivities.OverlayActivity;
 import cuteam17.cuteam17rpi.OverlayActivities.SMSOverlayActivity;
+import cuteam17.cuteam17rpi.OverlayActivities.TelephoneOverlayActivity;
 
 //ToDo: make RpiBtHandler and PhoneBtHandler subclasses of a BtHandler class
 public class RpiBtHandler extends Handler {
@@ -61,19 +63,28 @@ public class RpiBtHandler extends Handler {
 
 	private void handleSMS(Message msg) {
 		SMSTransferItem item = deserializeMessageObject(msg, SMSTransferItem.class);
-		if (item != null) {
-			Intent overlay = new Intent(mContext, SMSOverlayActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putSerializable(OverlayActivity.BT_TRANSFER_ITEM_EXTRA, item);
-			overlay.putExtras(bundle);
-			mContext.startActivity(overlay);
-		}
+		startOverlayActivity(item, SMSOverlayActivity.class);
 	}
 
 	private void handleTelephone(Message msg) {
 		TelephoneTransferItem item = deserializeMessageObject(msg, TelephoneTransferItem.class);
-		Intent i = new Intent("cuteam17.cuteam17btlibrary.Click");
-		mContext.sendBroadcast(i);
+
+		Intent intent;
+		if (item != null) {
+			//ToDo: check who the phone call is from, don't assume it is from the previous TelephoneTransferItem
+			switch (item.getTelephoneState()) {
+				case TelephonyManager.CALL_STATE_RINGING:
+					startOverlayActivity(item, TelephoneOverlayActivity.class);
+					break;
+				case TelephonyManager.CALL_STATE_OFFHOOK:
+				case TelephonyManager.CALL_STATE_IDLE:
+					intent = new Intent(TelephoneOverlayActivity.INTENT_ACTION_UPDATE);
+					intent.putExtra(TelephoneOverlayActivity.EXTRA_OBJ, item.getTelephoneState());
+					mContext.sendBroadcast(intent);
+					break;
+			}
+
+		}
 	}
 
 	private void handleNotification(Message msg) {
@@ -103,5 +114,15 @@ public class RpiBtHandler extends Handler {
 
 		return type.cast(returnObject);
 
+	}
+
+	private <T extends OverlayActivity> void startOverlayActivity(BtTransferItem item, Class<T> type) {
+		if (item != null) {
+			Intent overlay = new Intent(mContext, type);
+			Bundle bundle = new Bundle();
+			bundle.putSerializable(OverlayActivity.BT_TRANSFER_ITEM_EXTRA, item);
+			overlay.putExtras(bundle);
+			mContext.startActivity(overlay);
+		}
 	}
 }

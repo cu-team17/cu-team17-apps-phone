@@ -4,7 +4,7 @@ import android.telephony.TelephonyManager;
 
 public class TelephoneTransferItem extends BtTransferItem {
 
-	private int telephoneState;
+	private int telephoneState = TelephonyManager.CALL_STATE_IDLE;
 	private String phoneNumber;
 	private String contactName;
 

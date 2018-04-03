@@ -17,7 +17,7 @@ public class SMSOverlayActivity extends OverlayActivity {
 
 		SMSTransferItem msg;
 		try {
-			msg = (SMSTransferItem) getBtTransferItem();
+			msg = (SMSTransferItem) getBtTransferItem(getIntent());
 		} catch(NullPointerException e) {
 			return;
 		}

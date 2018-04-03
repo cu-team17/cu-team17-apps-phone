@@ -27,6 +27,7 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		this.context = context;
+
 		String intentAction = intent.getAction();
 		if (intentAction == null) return;
 
@@ -50,22 +51,23 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 			//String s = new String((byte[])extras.get("header"));
 
 		} else if (intentAction.equals("android.intent.action.PHONE_STATE") && prefs.getPhonePref()) {
-			String stateExtra;
-			String stateNumber;
-			try {
-				stateExtra = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-				stateNumber = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
-			} catch (NullPointerException e) {
-				return;
+			Bundle bundle = intent.getExtras();
+			if (bundle != null) {
+				String stateExtra = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
+				String stateNumber = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+
+				if (stateExtra != null) {
+					if (stateExtra.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+						updateTelephoneState(TelephonyManager.CALL_STATE_RINGING, stateNumber);
+					} else if (stateExtra.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+						updateTelephoneState(TelephonyManager.CALL_STATE_OFFHOOK, stateNumber);
+					} else if (stateExtra.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+						updateTelephoneState(TelephonyManager.CALL_STATE_IDLE, stateNumber);
+					}
+				}
+
 			}
 
-			if (stateExtra.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-				updateTelephoneState(TelephonyManager.CALL_STATE_RINGING, stateNumber);
-			} else if (stateExtra.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
-				updateTelephoneState(TelephonyManager.CALL_STATE_OFFHOOK, stateNumber);
-			} else if (stateExtra.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-				updateTelephoneState(TelephonyManager.CALL_STATE_IDLE, stateNumber);
-			}
 
 		}/* else if (intentAction.equals("android.intent.action.NEW_OUTGOING_CALL")) {
 			Log.d("Call", "Outgoing");

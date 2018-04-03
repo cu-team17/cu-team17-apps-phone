@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -39,17 +40,17 @@ public abstract class OverlayActivity extends AppCompatActivity {
 	protected void removeOverlayView() {
 		if (overlayView != null) {
 			WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-			wm.removeView(overlayView);
+			if (wm != null) wm.removeView(overlayView);
+			overlayView = null;
 		}
 	}
 
-	protected BtTransferItem getBtTransferItem() {
-		Intent intent = getIntent();
-		try {
+	protected BtTransferItem getBtTransferItem(Intent intent) {
+		Bundle bundle = intent.getExtras();
+		if (bundle != null) {
 			return (BtTransferItem) intent.getExtras().getSerializable(BT_TRANSFER_ITEM_EXTRA);
-		} catch(Exception e) {
+		} else {
 			return null;
 		}
-
 	}
 }
