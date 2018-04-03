@@ -1,22 +1,20 @@
-package cuteam17.cuteam17rpi.OverlayActivities;
+package cuteam17.cuteam17rpi.Overlays;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TelephoneTransferItem;
 import cuteam17.cuteam17rpi.R;
 
-public class TelephoneOverlayActivity extends OverlayActivity {
+public class TelephoneOverlayService extends OverlayService {
 
 	public static final String INTENT_ACTION_UPDATE = "cuteam17.cuteam17rpi.TelephoneOverlay.UPDATE";
 
@@ -30,6 +28,7 @@ public class TelephoneOverlayActivity extends OverlayActivity {
 	private BroadcastReceiver telephoneUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			Log.d("Broadcast", "here");
 			String action = intent.getAction();
 			if (action == null) return;
 
@@ -54,12 +53,10 @@ public class TelephoneOverlayActivity extends OverlayActivity {
 	};
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
+	public int onStartCommand(Intent intent, int flags, int startId) {
 		registerReceiver(telephoneUpdateReceiver, new IntentFilter(INTENT_ACTION_UPDATE));
 
-		TelephoneTransferItem item = (TelephoneTransferItem) getBtTransferItem(getIntent());
+		TelephoneTransferItem item = (TelephoneTransferItem) getBtTransferItem(intent);
 		if (item != null) {
 			LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			if (inflater != null) {
@@ -71,6 +68,7 @@ public class TelephoneOverlayActivity extends OverlayActivity {
 					TextView caller_id = view.findViewById(R.id.caller_id);
 					caller_id.setText(contactName);
 					if (phoneNumber != null && !phoneNumber.isEmpty()) {
+						Log.d("phone", "here");
 						TextView caller_id_extra = view.findViewById(R.id.caller_id_extra);
 						caller_id_extra.setVisibility(View.VISIBLE);
 						caller_id_extra.setText(phoneNumber);
@@ -85,10 +83,10 @@ public class TelephoneOverlayActivity extends OverlayActivity {
 				addOverlayView(view);
 			}
 		}
-
-		finish();
+		return START_NOT_STICKY;
 	}
 
+	/*
 	protected void onDestroy() {
 		super.onDestroy();
 
@@ -99,14 +97,14 @@ public class TelephoneOverlayActivity extends OverlayActivity {
 				Thread.sleep(1000);
 			} catch(Exception e) {}
 		}
-		removeOverlayView();
+		//removeOverlayView();
 
-		unregisterReceiver(telephoneUpdateReceiver);
-	}
+		//unregisterReceiver(telephoneUpdateReceiver);
+	}*/
 
 	private String formatPhoneNumber(String rawPhoneNumber) {
 
-		if (rawPhoneNumber != null) {
+		if (rawPhoneNumber != null && rawPhoneNumber.length() == 10) {
 			java.text.MessageFormat phoneNumberFmt = new java.text.MessageFormat("({0})-{1}-{2}");
 			String[] phoneNumArr={rawPhoneNumber.substring(0, 3),
 					rawPhoneNumber.substring(3,6),
@@ -116,5 +114,4 @@ public class TelephoneOverlayActivity extends OverlayActivity {
 
 		return null;
 	}
-
 }

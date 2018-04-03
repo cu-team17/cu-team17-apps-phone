@@ -1,22 +1,26 @@
-package cuteam17.cuteam17rpi.OverlayActivities;
+package cuteam17.cuteam17rpi.Overlays;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.IBinder;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 
 import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
 
-public abstract class OverlayActivity extends AppCompatActivity {
-
-	public static final String BT_TRANSFER_ITEM_EXTRA = "EXTRA_BT_TRANSFER_ITEM";
+public abstract class OverlayService extends Service {
 
 	private View overlayView;
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
 
 	protected void addOverlayView(View overlayView) {
 		this.overlayView = overlayView;
@@ -48,7 +52,7 @@ public abstract class OverlayActivity extends AppCompatActivity {
 	protected BtTransferItem getBtTransferItem(Intent intent) {
 		Bundle bundle = intent.getExtras();
 		if (bundle != null) {
-			return (BtTransferItem) intent.getExtras().getSerializable(BT_TRANSFER_ITEM_EXTRA);
+			return (BtTransferItem) intent.getExtras().getSerializable(OverlayActivity.BT_TRANSFER_ITEM_EXTRA);
 		} else {
 			return null;
 		}

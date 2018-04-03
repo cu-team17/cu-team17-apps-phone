@@ -20,9 +20,8 @@ import cuteam17.cuteam17btlibrary.BtTransferItems.NotificationTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TelephoneTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TransferItemType;
-import cuteam17.cuteam17rpi.OverlayActivities.OverlayActivity;
-import cuteam17.cuteam17rpi.OverlayActivities.SMSOverlayActivity;
-import cuteam17.cuteam17rpi.OverlayActivities.TelephoneOverlayActivity;
+import cuteam17.cuteam17rpi.Overlays.OverlayActivity;
+import cuteam17.cuteam17rpi.Overlays.TelephoneOverlayService;
 
 //ToDo: make RpiBtHandler and PhoneBtHandler subclasses of a BtHandler class
 public class RpiBtHandler extends Handler {
@@ -63,23 +62,26 @@ public class RpiBtHandler extends Handler {
 
 	private void handleSMS(Message msg) {
 		SMSTransferItem item = deserializeMessageObject(msg, SMSTransferItem.class);
-		startOverlayActivity(item, SMSOverlayActivity.class);
+		if (item != null) {
+			startOverlayActivity(item, "cuteam17.cuteam17rpi.Overlays.SMSOverlayService");
+		}
 	}
 
 	private void handleTelephone(Message msg) {
 		TelephoneTransferItem item = deserializeMessageObject(msg, TelephoneTransferItem.class);
 
-		Intent intent;
 		if (item != null) {
+			Intent intent;
 			//ToDo: check who the phone call is from, don't assume it is from the previous TelephoneTransferItem
 			switch (item.getTelephoneState()) {
 				case TelephonyManager.CALL_STATE_RINGING:
-					startOverlayActivity(item, TelephoneOverlayActivity.class);
+					startOverlayActivity(item, "cuteam17.cuteam17rpi.Overlays.TelephoneOverlayService");
 					break;
 				case TelephonyManager.CALL_STATE_OFFHOOK:
 				case TelephonyManager.CALL_STATE_IDLE:
-					intent = new Intent(TelephoneOverlayActivity.INTENT_ACTION_UPDATE);
-					intent.putExtra(TelephoneOverlayActivity.EXTRA_OBJ, item.getTelephoneState());
+					Log.d("Broad", "cast");
+					intent = new Intent(TelephoneOverlayService.INTENT_ACTION_UPDATE);
+					intent.putExtra(TelephoneOverlayService.EXTRA_OBJ, item.getTelephoneState());
 					mContext.sendBroadcast(intent);
 					break;
 			}
@@ -116,10 +118,11 @@ public class RpiBtHandler extends Handler {
 
 	}
 
-	private <T extends OverlayActivity> void startOverlayActivity(BtTransferItem item, Class<T> type) {
+	private void startOverlayActivity(BtTransferItem item, String type) {
 		if (item != null) {
-			Intent overlay = new Intent(mContext, type);
+			Intent overlay = new Intent(mContext, OverlayActivity.class);
 			Bundle bundle = new Bundle();
+			bundle.putString(OverlayActivity.OVERLAY_CLASS_TYPE, type);
 			bundle.putSerializable(OverlayActivity.BT_TRANSFER_ITEM_EXTRA, item);
 			overlay.putExtras(bundle);
 			mContext.startActivity(overlay);

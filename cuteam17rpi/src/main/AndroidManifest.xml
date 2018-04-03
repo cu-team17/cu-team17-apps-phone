@@ -22,19 +22,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="cuteam17.cuteam17btlibrary.BtFindDeviceActivity" />
+        <activity
+            android:name="cuteam17.cuteam17btlibrary.BtFindDeviceActivity" />
 
         <activity
-            android:name="cuteam17.cuteam17rpi.OverlayActivities.SMSOverlayActivity"
+            android:name="cuteam17.cuteam17rpi.Overlays.OverlayActivity"
             android:theme="@android:style/Theme.NoDisplay" />
 
-        <activity
-            android:name="cuteam17.cuteam17rpi.OverlayActivities.TelephoneOverlayActivity"
-            android:theme="@android:style/Theme.NoDisplay" />
+        <service
+            android:name="cuteam17.cuteam17rpi.Overlays.SMSOverlayService"
+            android:exported="false" />
 
-        <activity
-            android:name="cuteam17.cuteam17rpi.OverlayActivities.NotificationOverlayActivity"
-            android:theme="@android:style/Theme.NoDisplay" />
+        <service
+            android:name="cuteam17.cuteam17rpi.Overlays.TelephoneOverlayService"
+            android:exported="false" />
 
         <service
             android:name=".RpiBtTransferService"/>

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cuteam17.cuteam17btlibrary.BtFindDeviceActivity;
-import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferService;
 
 public class MainActivity extends AppCompatActivity {
