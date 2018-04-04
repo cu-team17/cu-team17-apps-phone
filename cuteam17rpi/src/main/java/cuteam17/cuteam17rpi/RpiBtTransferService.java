@@ -18,6 +18,6 @@ public class RpiBtTransferService extends BtTransferService {
 
 	protected void connectionRestart() {
 		super.connectionRestart();
-		connectByPref();
+		//connectByPref();
 	}
 }

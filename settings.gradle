@@ -1,1 +1,1 @@
-include ':app', ':cuteam17rpi', ':cuteam17btlibrary'
+include ':cuteam17phone', ':cuteam17rpi', ':cuteam17btlibrary'

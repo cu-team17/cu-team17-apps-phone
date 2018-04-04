@@ -94,35 +94,34 @@ public class BtTransferService extends Service {
 		if (intent == null || intent.getAction() == null) {
 			Log.d(TAG, "connection restart");
 			connectionRestart();
-			return START_STICKY;
+		} else {
+			switch (intent.getAction()) {
+				case BtTransferService.BT_START:
+					start();
+					break;
+				case BtTransferService.BT_CONNECT:
+					SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
+					String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
+					if (btDeviceAdr != null) {
+						BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
+						connect(device);
+					}
+					break;
+				case BtTransferService.BT_STOP:
+					stop();
+					break;
+				case BtTransferService.BT_WRITE:
+					try {
+						BtTransferItem item = (BtTransferItem) intent.getExtras().getSerializable(INTENT_EXTRA_WRITE);
+						write(item, item.type.header);
+					} catch (Exception e) {
+						return START_STICKY;
+					}
+					break;
+			}
 		}
 
-		switch (intent.getAction()) {
-			case BtTransferService.BT_START:
-				start();
-				break;
-			case BtTransferService.BT_CONNECT:
-				SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-				String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
-				if (btDeviceAdr != null) {
-					BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
-					connect(device);
-				}
-				break;
-			case BtTransferService.BT_STOP:
-				stop();
-				break;
-			case BtTransferService.BT_WRITE:
-				try {
-					BtTransferItem item = (BtTransferItem) intent.getExtras().getSerializable(INTENT_EXTRA_WRITE);
-					write(item, item.type.header);
-				} catch (Exception e) {
-					return START_STICKY;
-				}
-				break;
-		}
-
-		return Service.START_STICKY;
+		return START_STICKY;
 	}
 
 	@Override
@@ -379,7 +378,7 @@ public class BtTransferService extends Service {
 					Log.e(TAG+"-Connect", "unable to close() socket during connection failure");
 				}
 
-				connectFailed();
+				//connectFailed();
 				Log.e(TAG+"-Connect", "connect() failed");
 				return;
 			}

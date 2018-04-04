@@ -12,6 +12,7 @@ import android.provider.Settings;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import cuteam17.cuteam17btlibrary.BtFindDeviceActivity;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferItems.TelephoneTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferService;
 
 public class MainActivity extends AppCompatActivity {
@@ -119,15 +121,32 @@ public class MainActivity extends AppCompatActivity {
 
 	//ToDo: remove just for testing
 	public void connectBT(View view) {
+		//Intent intent = new Intent(this, PhoneBtTransferService.class);
+		//intent.setAction(BtTransferService.BT_CONNECT);
+		//startService(intent);
+		TelephoneTransferItem msg = new TelephoneTransferItem(TelephonyManager.CALL_STATE_IDLE, "3038680303", "Jackson");
+
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(BtTransferService.BT_CONNECT);
+		intent.setAction(PhoneBtTransferService.BT_WRITE);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, msg);
+		intent.putExtras(bundle);
 		startService(intent);
 	}
 
 	//ToDo: remove just for testing
 	public void stopBT(View view) {
+		//Intent intent = new Intent(this, PhoneBtTransferService.class);
+		//intent.setAction(PhoneBtTransferService.BT_STOP);
+		//startService(intent);
+
+		TelephoneTransferItem msg = new TelephoneTransferItem(TelephonyManager.CALL_STATE_RINGING, "3038680303", "Jackson");
+
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(PhoneBtTransferService.BT_STOP);
+		intent.setAction(PhoneBtTransferService.BT_WRITE);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, msg);
+		intent.putExtras(bundle);
 		startService(intent);
 	}
 

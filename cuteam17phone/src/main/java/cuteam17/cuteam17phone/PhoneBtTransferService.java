@@ -18,7 +18,7 @@ public class PhoneBtTransferService extends BtTransferService {
 
 	protected void connectionRestart() {
 		super.connectionRestart();
-		start();
+		//start();
 	}
 
 
