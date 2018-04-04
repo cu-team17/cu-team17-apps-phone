@@ -18,17 +18,11 @@ public class TelephoneOverlayService extends OverlayService {
 
 	public static final String INTENT_ACTION_UPDATE = "cuteam17.cuteam17rpi.TelephoneOverlay.UPDATE";
 
-	public static final String EXTRA_OBJ = "state";
-
-	private View view;
-
-	private long startTime;
-	private long endTime = 30000;
+	private View overlayView;
 
 	private BroadcastReceiver telephoneUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d("Broadcast", "here");
 			String action = intent.getAction();
 			if (action == null) return;
 
@@ -38,13 +32,13 @@ public class TelephoneOverlayService extends OverlayService {
 					if (item.getTelephoneState() == TelephonyManager.CALL_STATE_OFFHOOK) {
 						removeOverlayView();
 					} else if (item.getTelephoneState() == TelephonyManager.CALL_STATE_IDLE) {
-						TextView telephone_call_header = view.findViewById(R.id.telephone_call_header);
+						TextView telephone_call_header = overlayView.findViewById(R.id.telephone_call_header);
 						//ToDO: set text and color from values
 						telephone_call_header.setText("Missed Call");
 						telephone_call_header.setTextColor(Color.parseColor("#C13A43"));
 
-						startTime = System.currentTimeMillis();
-						endTime = 4000;
+						cancelScheduledRemoval();
+						createScheduledRemoval(5);
 					}
 				}
 
@@ -60,47 +54,35 @@ public class TelephoneOverlayService extends OverlayService {
 		if (item != null) {
 			LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			if (inflater != null) {
-				view = inflater.inflate(R.layout.transfer_telephone_call, null);
+				overlayView = inflater.inflate(R.layout.transfer_telephone_call, null);
 
 				String contactName = item.getContactName();
 				String phoneNumber = formatPhoneNumber(item.getPhoneNumber());
 				if (contactName != null && !contactName.isEmpty()) {
-					TextView caller_id = view.findViewById(R.id.caller_id);
+					TextView caller_id = overlayView.findViewById(R.id.caller_id);
 					caller_id.setText(contactName);
 					if (phoneNumber != null && !phoneNumber.isEmpty()) {
-						Log.d("phone", "here");
-						TextView caller_id_extra = view.findViewById(R.id.caller_id_extra);
+						TextView caller_id_extra = overlayView.findViewById(R.id.caller_id_extra);
 						caller_id_extra.setVisibility(View.VISIBLE);
 						caller_id_extra.setText(phoneNumber);
 					}
 				} else {
 					if (phoneNumber != null && !phoneNumber.isEmpty()) {
-						TextView caller_id_extra = view.findViewById(R.id.caller_id);
+						TextView caller_id_extra = overlayView.findViewById(R.id.caller_id);
 						caller_id_extra.setText(phoneNumber);
 					}
 				}
 
-				addOverlayView(view);
+				addOverlayView(overlayView, 20);
 			}
 		}
 		return START_NOT_STICKY;
 	}
 
-	/*
-	protected void onDestroy() {
+	public void onDestroy() {
 		super.onDestroy();
-
-		//ToDo: convert to a job scheduler where broadcast receiver is checked, this is a bad way of doing it
-		startTime = System.currentTimeMillis();
-		while (System.currentTimeMillis() - startTime < endTime) {
-			try {
-				Thread.sleep(1000);
-			} catch(Exception e) {}
-		}
-		//removeOverlayView();
-
-		//unregisterReceiver(telephoneUpdateReceiver);
-	}*/
+		unregisterReceiver(telephoneUpdateReceiver);
+	}
 
 	private String formatPhoneNumber(String rawPhoneNumber) {
 

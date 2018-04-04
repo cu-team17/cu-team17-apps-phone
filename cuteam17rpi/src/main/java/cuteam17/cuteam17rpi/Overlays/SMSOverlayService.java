@@ -48,7 +48,7 @@ public class SMSOverlayService extends OverlayService {
 				TextView body = msgView.findViewById(R.id.MsgBody);
 				body.setText(msg.getMsg());
 
-				addOverlayView(msgView);
+				addOverlayView(msgView, 10);
 			}
 		}
 		return START_NOT_STICKY;
