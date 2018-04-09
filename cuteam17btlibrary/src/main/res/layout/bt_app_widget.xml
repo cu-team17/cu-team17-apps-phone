@@ -1,0 +1,51 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#00eaeaea"
+    android:padding="@dimen/widget_margin">
+
+    <ImageButton
+        android:id="@+id/widget_bt_connected_state_icon"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@null"
+        android:layout_weight="4"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/bt_phone_connected_icon"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/widget_bt_connected_state_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Phone Connected"/>
+
+        <ImageButton
+            android:id="@+id/widget_settings_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/widget_bt_connected_state_text"
+            android:background="#1f4869"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/bt_phone_connected_icon"/>
+
+    </RelativeLayout>
+
+
+
+
+
+
+
+
+
+</LinearLayout>

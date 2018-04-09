@@ -3,8 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CUTeam17Phone.iml" filepath="$PROJECT_DIR$/CUTeam17Phone.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cuteam17btlibrary/cuteam17btlibrary.iml" filepath="$PROJECT_DIR$/cuteam17btlibrary/cuteam17btlibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/cuteam17phone/app.iml" filepath="$PROJECT_DIR$/cuteam17phone/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cuteam17btlibrary/cuteam17btlibrary.iml" filepath="$PROJECT_DIR$/cuteam17btlibrary/cuteam17btlibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cuteam17phone/cuteam17phone.iml" filepath="$PROJECT_DIR$/cuteam17phone/cuteam17phone.iml" />
       <module fileurl="file://$PROJECT_DIR$/cuteam17rpi/cuteam17rpi.iml" filepath="$PROJECT_DIR$/cuteam17rpi/cuteam17rpi.iml" />
     </modules>
   </component>

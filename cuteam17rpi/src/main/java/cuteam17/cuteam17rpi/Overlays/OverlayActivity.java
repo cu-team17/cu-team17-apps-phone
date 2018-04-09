@@ -22,7 +22,7 @@ public class OverlayActivity extends AppCompatActivity {
 			String classname = extras.getString(OVERLAY_CLASS_TYPE);
 			Serializable item = extras.getSerializable(BT_TRANSFER_ITEM_EXTRA);
 			//ToDo: potentially make subclasses, of this class, for each overlay type(SMS, Telephone, etc.) and
-			//just start the respective service from there instead of passing a type of class
+			//just start the respective service from there, instead of passing a string for the type of class
 			try {
 				Class<?> classType = Class.forName(classname);
 				Intent intent = new Intent(this, classType);

@@ -29,6 +29,15 @@
 
         <activity android:name="cuteam17.cuteam17btlibrary.BtFindDeviceActivity" />
 
+        <receiver android:name="cuteam17.cuteam17btlibrary.BtAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/bt_app_widget_info"/>
+        </receiver>
+
         <receiver
             android:name=".PhoneBroadcastReceiver"
             android:enabled="true"
@@ -44,11 +53,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
-            </intent-filter>
-            -->
+
         </receiver>
 
         <service
