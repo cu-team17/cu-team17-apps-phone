@@ -1,51 +1,62 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@null"
     android:orientation="vertical"
-    android:background="#00eaeaea"
     android:padding="@dimen/widget_margin">
-
-    <ImageButton
-        android:id="@+id/widget_bt_connected_state_icon"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@null"
-        android:layout_weight="4"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:src="@drawable/bt_phone_connected_icon"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:layout_height="35dp"
+        android:background="#FF2B64B4">
 
         <TextView
-            android:id="@+id/widget_bt_connected_state_text"
+            android:id="@+id/widget_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Phone Connected"/>
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="8dp"
+            android:text="@string/widget_title"
+            android:textSize="20sp"
+            android:textColor="#ffffff"/>
 
         <ImageButton
             android:id="@+id/widget_settings_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/widget_bt_connected_state_text"
-            android:background="#1f4869"
+            android:layout_alignParentTop="true"
+            android:background="@null"
+            android:padding="5dp"
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
-            android:src="@drawable/bt_phone_connected_icon"/>
-
+            android:src="@drawable/settings_gear_white"/>
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/widget_bt_connected_state_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:background="#60000000"
+        android:text="@string/widget_bt_not_connected"
+        android:textSize="14sp"
+        android:textColor="#ededed"/>
 
 
-
-
-
-
-
+    <ImageButton
+        android:id="@+id/widget_bt_connected_state_icon"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#60000000"
+        android:layout_weight="1"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/bt_phone_connected_icon"/>
 
 </LinearLayout>

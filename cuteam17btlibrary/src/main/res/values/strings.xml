@@ -9,4 +9,7 @@
     <string name="bt_find_device_scan">Pair new device</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="widget_title">Phone</string>
+    <string name="widget_bt_connected">Connected</string>
+    <string name="widget_bt_not_connected">No connection</string>
 </resources>
