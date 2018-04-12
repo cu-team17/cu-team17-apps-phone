@@ -13,8 +13,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import cuteam17.cuteam17btlibrary.BtAppWidget;
 import cuteam17.cuteam17btlibrary.BtOperations;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
+import cuteam17.cuteam17btlibrary.BtTransferItems.TransferItemType;
 
 public class PhoneBtHandler extends Handler {
 
@@ -27,19 +29,35 @@ public class PhoneBtHandler extends Handler {
 
 	@Override
 	public void handleMessage(Message msg) {
-		BtOperations op = BtOperations.values()[msg.what];
-		switch (op) {
+		BtOperations operation = BtOperations.values()[msg.what];
+		switch (operation) {
 			case BT_READ:
-				switch (msg.arg1) {
-					//ToDo: change to use header from TransferItemType
-					case 49:
+				TransferItemType type = TransferItemType.getByHeader(msg.arg1);
+				switch (type) {
+					case SMS:
 						handleSMS(msg);
 						break;
 				}
+
 				break;
 			case BT_WRITE:
 				break;
 			case BT_STATE_UPDATE:
+				//ToDo: change to have a type enum like TransferItemType for Bluetooth connection state
+				switch (msg.arg1) {
+					case 97:
+						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_FAIL);
+						break;
+					case 98:
+						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_SUCCESS);
+						break;
+					case 99:
+						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_LOST);
+						break;
+					case 100:
+						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_DISCONNECTED);
+						break;
+				}
 				break;
 		}
 	}
@@ -64,5 +82,11 @@ public class PhoneBtHandler extends Handler {
 			//ToDo: handle exception
 		}
 		return null;
+	}
+
+	private void sendWidgetBroadcast(String action) {
+		Intent intent = new Intent(mContext, PhoneBtAppWidget.class);
+		intent.setAction(action);
+		mContext.sendBroadcast(intent);
 	}
 }

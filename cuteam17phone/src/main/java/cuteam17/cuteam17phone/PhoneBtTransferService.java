@@ -10,6 +10,7 @@ public class PhoneBtTransferService extends BtTransferService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
 		HandlerThread thread = new HandlerThread("Thread name", android.os.Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 		Looper looper = thread.getLooper();
