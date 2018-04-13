@@ -7,9 +7,13 @@
     <string name="bt_find_device_new_devices">Other devices</string>
     <string name="bt_find_device_no_new_devices">No devices found</string>
     <string name="bt_find_device_scan">Pair new device</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
+
     <string name="widget_title">Phone</string>
     <string name="widget_bt_connected">Connected</string>
     <string name="widget_bt_not_connected">No connection</string>
+    <string name="widget_bt_disconnected">Disconnected</string>
+    <string name="widget_bt_failed_to_connect">Failed to connect</string>
+    <string name="widget_bt_connecting">Connecting&#8230;</string>
+    <string name="widget_bt_disconnecting">Disconnecting&#8230;</string>
+
 </resources>

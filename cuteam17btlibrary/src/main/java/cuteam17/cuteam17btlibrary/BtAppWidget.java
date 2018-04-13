@@ -1,6 +1,5 @@
 package cuteam17.cuteam17btlibrary;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -9,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.util.concurrent.Executors;
@@ -72,10 +70,11 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 			//ToDo: set timer between allowed touches so user can't spam start/stop
 			if (btConnected) {
 				stopBt(context);
-				setViewsContent(context, true, "Disconnecting...");
+				setViewsContent(context, true, context.getResources().getString(R.string.widget_bt_disconnecting));
 			} else {
+				//ToDo: check if bluetooth is enabled
 				startBt(context);
-				setViewsContent(context, false, "Connecting...");
+				setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_connecting));
 			}
 			createScheduledReset(context);
 
@@ -88,14 +87,14 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 				String state = bundle.getString(EXTRA_STATE, "");
 				if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_SUCCESS)) {
 					btConnected = true;
-					setViewsContent(context, true, "Connected");
+					setViewsContent(context, true, context.getResources().getString(R.string.widget_bt_connected));
 				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_FAIL)) {
 					btConnected = false;
-					setViewsContent(context, false, "Failed to Connect", Color.parseColor("#F75D36"));
+					setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_failed_to_connect), Color.parseColor("#ED4015"));
 					createScheduledReset(context);
 				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_DISCONNECTED)) {
 					btConnected = false;
-					setViewsContent(context, false, "Disconnected");
+					setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_disconnected));
 					createScheduledReset(context);
 				}
 			}
@@ -115,7 +114,7 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 	}
 
 	private void setViewsContent(Context context, boolean isConnected, String connectedStateText) {
-		setViewsContent(context, isConnected, connectedStateText, Color.parseColor("#FFFFFF"));
+		setViewsContent(context, isConnected, connectedStateText, Color.parseColor("#E2E2E2"));
 
 	}
 
@@ -140,7 +139,7 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 		scheduledReset = scheduler.schedule(
 				new Runnable() {
 					public void run() {
-						setViewsContent(context, false, "Not Connected");
+						setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_not_connected));
 					}
 				}, 6, TimeUnit.SECONDS);
 	}

@@ -46,7 +46,7 @@
         android:background="#60000000"
         android:text="@string/widget_bt_not_connected"
         android:textSize="14sp"
-        android:textColor="#ededed"/>
+        android:textColor="#e2e2e2"/>
 
 
     <ImageButton
