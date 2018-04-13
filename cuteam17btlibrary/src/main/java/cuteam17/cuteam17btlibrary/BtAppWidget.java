@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -90,7 +91,7 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 					setViewsContent(context, true, "Connected");
 				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_FAIL)) {
 					btConnected = false;
-					setViewsContent(context, false, "Failed to Connect");
+					setViewsContent(context, false, "Failed to Connect", Color.parseColor("#F75D36"));
 					createScheduledReset(context);
 				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_DISCONNECTED)) {
 					btConnected = false;
@@ -114,6 +115,11 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 	}
 
 	private void setViewsContent(Context context, boolean isConnected, String connectedStateText) {
+		setViewsContent(context, isConnected, connectedStateText, Color.parseColor("#FFFFFF"));
+
+	}
+
+	private void setViewsContent(Context context, boolean isConnected, String connectedStateText, int connectedStateTextColor) {
 		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.bt_app_widget);
 
 		if (isConnected) {
@@ -122,10 +128,10 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 			views.setImageViewResource(R.id.widget_bt_connected_state_icon, R.drawable.bt_phone_not_connected_icon);
 		}
 		views.setTextViewText(R.id.widget_bt_connected_state_text, connectedStateText);
+		views.setTextColor(R.id.widget_bt_connected_state_text, connectedStateTextColor);
 
 		AppWidgetManager manager = AppWidgetManager.getInstance(context);
 		manager.updateAppWidget(new ComponentName(context, this.getClass().getName()), views);
-
 	}
 
 	private void createScheduledReset(final Context context) {

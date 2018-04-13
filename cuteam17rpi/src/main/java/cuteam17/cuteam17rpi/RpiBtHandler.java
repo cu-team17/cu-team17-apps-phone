@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import cuteam17.cuteam17btlibrary.BtAppWidget;
 import cuteam17.cuteam17btlibrary.BtOperations;
 import cuteam17.cuteam17btlibrary.BtTransferItems.BtTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.NotificationTransferItem;
@@ -57,7 +58,10 @@ public class RpiBtHandler extends Handler {
 				// Potential implementation options after BluetoothTransferService writes to the bluetooth socket
 				break;
 			case BT_STATE_UPDATE:
-				// Potential implementation options for changes/updates in the state of BluetoothTransferService
+				Intent intent = new Intent(mContext, RpiBtAppWidget.class);
+				intent.setAction(BtAppWidget.BT_UPDATE);
+				intent.putExtra(BtAppWidget.EXTRA_STATE, (String) msg.obj);
+				mContext.sendBroadcast(intent);
 				break;
 		}
 	}

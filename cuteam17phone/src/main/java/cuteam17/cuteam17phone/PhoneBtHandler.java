@@ -18,6 +18,7 @@ import cuteam17.cuteam17btlibrary.BtOperations;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TransferItemType;
 
+//ToDo: make RpiBtHandler and PhoneBtHandler subclasses of a BtHandler class
 public class PhoneBtHandler extends Handler {
 
 	private Context mContext;
@@ -47,7 +48,7 @@ public class PhoneBtHandler extends Handler {
 				intent.setAction(BtAppWidget.BT_UPDATE);
 				intent.putExtra(BtAppWidget.EXTRA_STATE, (String) msg.obj);
 				mContext.sendBroadcast(intent);
-
+				break;
 		}
 	}
 
@@ -73,9 +74,4 @@ public class PhoneBtHandler extends Handler {
 		return null;
 	}
 
-	private void sendWidgetBroadcast(String action) {
-		Intent intent = new Intent(mContext, PhoneBtAppWidget.class);
-		intent.setAction(action);
-		mContext.sendBroadcast(intent);
-	}
 }
