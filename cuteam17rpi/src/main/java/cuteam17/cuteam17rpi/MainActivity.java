@@ -21,9 +21,9 @@ import cuteam17.cuteam17btlibrary.BtTransferService;
 
 public class MainActivity extends AppCompatActivity {
 
-	private static final int REQUEST_CODE_PERMISSIONS_LIST = 101;
 	private static final int REQUEST_CODE_DEVICE_LIST_ACTIVITY = 105;
 	private static final int REQUEST_ENABLE_BLUETOOTH = 110;
+	private static final int REQUEST_LOCATION_PERMISSIONS = 220;
 
 	private BluetoothAdapter mBluetoothAdapter;
 
@@ -36,30 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
 		establishPermissions();
 
-		/*
-		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
-		if (btDeviceAdr != null) {
-			// bluetooth setup
-		}
-		*/
-
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
 			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
 			finish();
 		}
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		//ToDo: stop bluetooth
 	}
 
 	public void setupBluetooth(View view) {
@@ -72,14 +53,13 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	public void connectBT() {
+	public void connectBtTransferService() {
 		Intent intent = new Intent(this, RpiBtTransferService.class);
 		intent.setAction(BtTransferService.BT_CONNECT);
 		startService(intent);
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		//ToDo: add overlays permission request result
 		switch (requestCode) {
 			case REQUEST_CODE_DEVICE_LIST_ACTIVITY:
 				if (resultCode == RESULT_OK) {
@@ -90,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 						editor.putString("BT_Connected_Device", btDeviceAdr);
 						editor.apply();
 
-						connectBT();
+						connectBtTransferService();
 					} catch (NullPointerException e) {
 						return;
 					}
@@ -108,64 +88,25 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	private boolean establishPermissions() {
+	private void establishPermissions() {
 		if (!Settings.canDrawOverlays(this)) {
 			Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
 			startActivityForResult(i, OVERLAY_REQUEST_CODE);
 		}
 
-		List<String> permissionsList = new ArrayList<String>();
-
-		addPermissionToList(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-		if (!permissionsList.isEmpty()) {
-			requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), REQUEST_CODE_PERMISSIONS_LIST);
-			return true;
+		if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSIONS);
 		}
-		return false;
 
-	}
-
-	private void addPermissionToList(List<String> permissionsList, String permission) {
-		if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-			permissionsList.add(permission);
-		}
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 		switch (requestCode) {
-			case REQUEST_CODE_PERMISSIONS_LIST:
-				for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
-					permissionResult(permissions[i],grantResults[i]);
-				}
+			case REQUEST_LOCATION_PERMISSIONS:
+				//ToDo: handle lack of location permission, location permission is needed for bluetooth discovery
 				break;
 		}
 	}
 
-	private void permissionResult(String permission, int grantResult) {
-		switch (permission) {
-			case Manifest.permission.RECEIVE_SMS:
-				if (grantResult == PackageManager.PERMISSION_GRANTED) {
-					//ToDo: messaging permission granted
-				} else {
-					//ToDo: no messaging permission
-					break;
-				}
-			case Manifest.permission.READ_PHONE_STATE:
-				if (grantResult == PackageManager.PERMISSION_GRANTED) {
-					//ToDo: phone permission granted
-				} else {
-					//ToDo: no phone permission
-				}
-				break;
-			case Manifest.permission.READ_CONTACTS:
-				if (grantResult == PackageManager.PERMISSION_GRANTED) {
-					//ToDo: contacts permission granted
-				} else {
-					//ToDo: no contacts permission
-				}
-				break;
-		}
-	}
 }

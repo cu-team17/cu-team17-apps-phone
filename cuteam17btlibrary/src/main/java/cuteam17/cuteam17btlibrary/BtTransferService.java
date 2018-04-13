@@ -25,6 +25,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -104,27 +105,24 @@ public class BtTransferService extends Service {
 					start();
 					break;
 				case BtTransferService.BT_CONNECT:
-					SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
-					String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
-					if (btDeviceAdr != null) {
-						BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
-						connect(device);
-					}
+					connectByPref();
 					break;
 				case BtTransferService.BT_STOP:
 					stop();
 					break;
 				case BtTransferService.BT_WRITE:
-					try {
-						BtTransferItem item = (BtTransferItem) intent.getExtras().getSerializable(INTENT_EXTRA_WRITE);
-						write(item, item.type.header);
-					} catch (Exception e) {
-						return START_STICKY;
+					Bundle bundle = intent.getExtras();
+					if (bundle != null) {
+						BtTransferItem item = (BtTransferItem) bundle.getSerializable(INTENT_EXTRA_WRITE);
+						if (item != null) {
+							write(item, item.type.header);
+						}
 					}
 					break;
 			}
 		}
 
+		//ToDo: probably no longer need to return start sticky with new widget to start/stop bluetooth
 		return START_STICKY;
 	}
 
@@ -140,6 +138,8 @@ public class BtTransferService extends Service {
 
 	// start AcceptThread to begin a session in listening (server) mode.
 	public synchronized void start() {
+		if (!mAdapter.isEnabled()) return;
+
 		if (mConnectThread != null) {
 			mConnectThread.cancel();
 			mConnectThread = null;
@@ -157,16 +157,22 @@ public class BtTransferService extends Service {
 	}
 
 	public void connectByPref() {
+		if (!mAdapter.isEnabled()) return;
+
 		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
 		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
 		if (btDeviceAdr != null) {
 			BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
 			connect(device);
+		} else {
+			//ToDo: stateUpdate, no paired device
 		}
 	}
 
 	// Start the ConnectThread to initiate a connection to a remote device.
 	public synchronized void connect(BluetoothDevice device) {
+		if (!mAdapter.isEnabled()) return;
+
 		if (mState == STATE_CONNECTING) {
 			if (mConnectThread != null) {
 				mConnectThread.cancel();
@@ -205,6 +211,7 @@ public class BtTransferService extends Service {
 		mConnectedThread = new BtTransferService.ConnectedThread(socket);
 		mConnectedThread.start();
 
+		stateUpdate(STATE_UPDATE_CONNECTION_SUCCESS);
 		//device.getName();
 	}
 
@@ -321,7 +328,6 @@ public class BtTransferService extends Service {
 						switch (mState) {
 							case STATE_LISTEN:
 							case STATE_CONNECTING:
-								stateUpdate(STATE_UPDATE_CONNECTION_SUCCESS);
 								connected(socket, socket.getRemoteDevice());
 								break;
 							case STATE_NONE:
@@ -400,7 +406,6 @@ public class BtTransferService extends Service {
 			}
 
 			failedConnects = 0;
-			stateUpdate(STATE_UPDATE_CONNECTION_SUCCESS);
 			connected(mmSocket, mmDevice);
 		}
 
