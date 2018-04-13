@@ -7,22 +7,27 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public abstract class BtAppWidget extends AppWidgetProvider {
 
 	private static final String BT_CONNECTED_STATE_ICON_CLICK = "cuteam17btlibrary.widget.state_icon_click";
 	private static final String SETTINGS_BUTTON_CLICK = "cuteam17btlibrary.widget.settings_button_click";
 
-	//ToDo: move to BtTransferService, strings referring to connection state make more sense there
-	public static final String BT_UPDATE_STATE_CONNECT_SUCCESS = "cuteam17btlibrary.widget.bt_connect_success";
-	public static final String BT_UPDATE_STATE_CONNECT_FAIL = "cuteam17btlibrary.widget.bt_connect_fail";
-	public static final String BT_UPDATE_STATE_CONNECT_LOST = "cuteam17btlibrary.widget.bt_connect_lost";
-	public static final String BT_UPDATE_STATE_CONNECT_DISCONNECTED = "cuteam17btlibrary.widget.bt_connect_disconnected";
+	//ToDo: maybe move to be in bluetooth service and not the widget
+	public static final String BT_UPDATE = "cuteam17btlibrary.widget.bt_update";
+	public static final String EXTRA_STATE = "cuteam17btlibrary.widget.bt_extra";
 
+	private static boolean btConnected = false;
 
-	private static boolean btEnabled = false;
+	private ScheduledFuture<?> scheduledReset;
 
 	private void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
 								 int appWidgetId) {
@@ -50,7 +55,9 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 
 	@Override
 	public void onDisabled(Context context) {
-		// Enter relevant functionality for when the last widget is disabled
+		if (scheduledReset != null) {
+			scheduledReset.cancel(false);
+		}
 	}
 
 	@Override
@@ -61,22 +68,36 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 		if (intentAction == null) return;
 
 		if (intentAction.equals(BT_CONNECTED_STATE_ICON_CLICK)) {
-			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.bt_app_widget);
-			//ToDo: update connected text, also don't update until BtTransferService handler updates
-			if (btEnabled) {
-				startBt(context);
-				views.setImageViewResource(R.id.widget_bt_connected_state_icon, R.drawable.bt_phone_not_connected_icon);
-				btEnabled = false;
-			} else {
+			//ToDo: set timer between allowed touches so user can't spam start/stop
+			if (btConnected) {
 				stopBt(context);
-				views.setImageViewResource(R.id.widget_bt_connected_state_icon, R.drawable.bt_phone_connected_icon);
-				btEnabled = true;
+				setViewsContent(context, true, "Disconnecting...");
+			} else {
+				startBt(context);
+				setViewsContent(context, false, "Connecting...");
 			}
+			createScheduledReset(context);
 
-			AppWidgetManager manager = AppWidgetManager.getInstance(context);
-			manager.updateAppWidget(new ComponentName(context, this.getClass().getName()), views);
 		} else if (intentAction.equals(SETTINGS_BUTTON_CLICK)) {
 			startMainActivity(context);
+
+		} else if (intentAction.equals(BT_UPDATE)) {
+			Bundle bundle = intent.getExtras();
+			if (bundle != null) {
+				String state = bundle.getString(EXTRA_STATE, "");
+				if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_SUCCESS)) {
+					btConnected = true;
+					setViewsContent(context, true, "Connected");
+				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_FAIL)) {
+					btConnected = false;
+					setViewsContent(context, false, "Failed to Connect");
+					createScheduledReset(context);
+				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_DISCONNECTED)) {
+					btConnected = false;
+					setViewsContent(context, false, "Disconnected");
+					createScheduledReset(context);
+				}
+			}
 		}
 	}
 
@@ -91,5 +112,32 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 		intent.setAction(action);
 		return PendingIntent.getBroadcast(context, 0, intent, 0);
 	}
+
+	private void setViewsContent(Context context, boolean isConnected, String connectedStateText) {
+		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.bt_app_widget);
+
+		if (isConnected) {
+			views.setImageViewResource(R.id.widget_bt_connected_state_icon, R.drawable.bt_phone_connected_icon);
+		} else {
+			views.setImageViewResource(R.id.widget_bt_connected_state_icon, R.drawable.bt_phone_not_connected_icon);
+		}
+		views.setTextViewText(R.id.widget_bt_connected_state_text, connectedStateText);
+
+		AppWidgetManager manager = AppWidgetManager.getInstance(context);
+		manager.updateAppWidget(new ComponentName(context, this.getClass().getName()), views);
+
+	}
+
+	private void createScheduledReset(final Context context) {
+		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+		scheduledReset = scheduler.schedule(
+				new Runnable() {
+					public void run() {
+						setViewsContent(context, false, "Not Connected");
+					}
+				}, 6, TimeUnit.SECONDS);
+	}
+
 }
 

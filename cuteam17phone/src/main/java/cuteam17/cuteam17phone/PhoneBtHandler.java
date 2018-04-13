@@ -43,22 +43,11 @@ public class PhoneBtHandler extends Handler {
 			case BT_WRITE:
 				break;
 			case BT_STATE_UPDATE:
-				//ToDo: change to have a type enum like TransferItemType for Bluetooth connection state
-				switch (msg.arg1) {
-					case 97:
-						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_FAIL);
-						break;
-					case 98:
-						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_SUCCESS);
-						break;
-					case 99:
-						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_LOST);
-						break;
-					case 100:
-						sendWidgetBroadcast(BtAppWidget.BT_UPDATE_STATE_CONNECT_DISCONNECTED);
-						break;
-				}
-				break;
+				Intent intent = new Intent(mContext, PhoneBtAppWidget.class);
+				intent.setAction(BtAppWidget.BT_UPDATE);
+				intent.putExtra(BtAppWidget.EXTRA_STATE, (String) msg.obj);
+				mContext.sendBroadcast(intent);
+
 		}
 	}
 

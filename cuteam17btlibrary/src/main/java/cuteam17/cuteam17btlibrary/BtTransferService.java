@@ -71,6 +71,10 @@ public class BtTransferService extends Service {
 
 	public static final String INTENT_EXTRA_WRITE = "EXTRA";
 
+	public static final String STATE_UPDATE_CONNECTION_SUCCESS = "cuteam17btlibrary.bt_connection_success";
+	public static final String STATE_UPDATE_CONNECTION_FAIL = "cuteam17btlibrary.bt_connection_fail";
+	public static final String STATE_UPDATE_CONNECTION_DISCONNECTED = "cuteam17btlibrary.bt_connection_disconnected";
+
 	private static final int HEADER_SIZE = 1;
 	private static final char EOT = 4;
 
@@ -268,6 +272,10 @@ public class BtTransferService extends Service {
 		mState = STATE_NONE;
 	}
 
+	private void stateUpdate(String update) {
+		mHandler.obtainMessage(BtOperations.BT_STATE_UPDATE.ordinal(), update).sendToTarget();
+	}
+
 	/**
 	 * This thread runs while listening for incoming connections. It behaves
 	 * like a server-side client. It runs until a connection is accepted
@@ -284,7 +292,7 @@ public class BtTransferService extends Service {
 			try {
 				tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE, MY_UUID_SECURE);
 			} catch (IOException e) {
-				Log.e(TAG+"-Accept", "listen() failed");
+				Log.e(TAG+":Accept", "listen() failed");
 			}
 			mmServerSocket = tmp;
 			mState = STATE_LISTEN;
@@ -302,7 +310,8 @@ public class BtTransferService extends Service {
 					// successful connection or an exception
 					socket = mmServerSocket.accept();
 				} catch (IOException e) {
-					Log.e(TAG+"-Accept", "accept() failed");
+					Log.e(TAG+":Accept", "accept() failed");
+					stateUpdate(STATE_UPDATE_CONNECTION_FAIL);
 					break;
 				}
 
@@ -312,6 +321,7 @@ public class BtTransferService extends Service {
 						switch (mState) {
 							case STATE_LISTEN:
 							case STATE_CONNECTING:
+								stateUpdate(STATE_UPDATE_CONNECTION_SUCCESS);
 								connected(socket, socket.getRemoteDevice());
 								break;
 							case STATE_NONE:
@@ -320,7 +330,7 @@ public class BtTransferService extends Service {
 								try {
 									socket.close();
 								} catch (IOException e) {
-									Log.e(TAG+"-Accept", "close() of unwanted socket failed");
+									Log.e(TAG+":Accept", "close() of unwanted socket failed");
 								}
 								break;
 						}
@@ -333,7 +343,7 @@ public class BtTransferService extends Service {
 			try {
 				mmServerSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG+"-Accept", "close() of server socket failed", e);
+				Log.e(TAG+":Accept", "close() of server socket failed", e);
 			}
 		}
 	}
@@ -356,7 +366,7 @@ public class BtTransferService extends Service {
 			try {
 				tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
 			} catch (IOException e) {
-				Log.e(TAG+"-Connect", "create() failed");
+				Log.e(TAG+":Connect", "create() failed");
 			}
 			mmSocket = tmp;
 			mState = STATE_CONNECTING;
@@ -375,11 +385,12 @@ public class BtTransferService extends Service {
 				try {
 					mmSocket.close();
 				} catch (IOException e2) {
-					Log.e(TAG+"-Connect", "unable to close() socket during connection failure");
+					Log.e(TAG+":Connect", "unable to close() socket during connection failure");
 				}
 
 				//connectFailed();
-				Log.e(TAG+"-Connect", "connect() failed");
+				Log.e(TAG+":Connect", "connect() failed");
+				stateUpdate(STATE_UPDATE_CONNECTION_FAIL);
 				return;
 			}
 
@@ -389,6 +400,7 @@ public class BtTransferService extends Service {
 			}
 
 			failedConnects = 0;
+			stateUpdate(STATE_UPDATE_CONNECTION_SUCCESS);
 			connected(mmSocket, mmDevice);
 		}
 
@@ -396,7 +408,7 @@ public class BtTransferService extends Service {
 			try {
 				mmSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG+"-Connect", "close() of socket failed");
+				Log.e(TAG+":Connect", "close() of socket failed");
 			}
 		}
 	}
@@ -420,7 +432,7 @@ public class BtTransferService extends Service {
 				tmpIn = socket.getInputStream();
 				tmpOut = socket.getOutputStream();
 			} catch (IOException e) {
-				Log.e(TAG+"-Connected", "temp sockets not created");
+				Log.e(TAG+":Connected", "temp sockets not created");
 			}
 
 			mmInStream = tmpIn;
@@ -429,7 +441,7 @@ public class BtTransferService extends Service {
 		}
 
 		public void run() {
-			Log.d(TAG+"-Connected", "BEGIN");
+			Log.d(TAG+":Connected", "BEGIN");
 			byte[] buffer = new byte[1024];
 			int bytes;
 
@@ -487,7 +499,8 @@ public class BtTransferService extends Service {
 						}
 					}
 				} catch (IOException e) {
-					Log.e(TAG+"-Connected", "Disconnected");
+					Log.e(TAG+":Connected", "Disconnected");
+					stateUpdate(STATE_UPDATE_CONNECTION_DISCONNECTED);
 					connectionRestart();
 					break;
 				}
@@ -506,7 +519,7 @@ public class BtTransferService extends Service {
 				//ToDo: make what into constant
 				//mHandler.obtainMessage(2, -1, -1, buffer).sendToTarget();
 			} catch (IOException e) {
-				Log.e(TAG+"-Connected", "Exception during write");
+				Log.e(TAG+":Connected", "Exception during write");
 			}
 		}
 
@@ -514,7 +527,7 @@ public class BtTransferService extends Service {
 			try {
 				mmSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG+"-Connected", "close() of connected socket failed");
+				Log.e(TAG+":Connected", "close() of connected socket failed");
 			}
 		}
 	}

@@ -57,6 +57,6 @@
         android:layout_weight="1"
         android:adjustViewBounds="true"
         android:scaleType="centerInside"
-        android:src="@drawable/bt_phone_connected_icon"/>
+        android:src="@drawable/bt_phone_not_connected_icon"/>
 
 </LinearLayout>
