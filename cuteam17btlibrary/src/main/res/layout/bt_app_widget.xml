@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:background="#FF2B64B4">
+        android:background="@color/bt_blue">
 
         <TextView
             android:id="@+id/widget_title"
@@ -19,7 +19,7 @@
             android:layout_marginStart="8dp"
             android:text="@string/widget_title"
             android:textSize="20sp"
-            android:textColor="#ffffff"/>
+            android:textColor="@color/widget_title"/>
 
         <ImageButton
             android:id="@+id/widget_settings_button"
@@ -43,17 +43,17 @@
         android:paddingBottom="2dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
-        android:background="#60000000"
+        android:background="@color/widget_trans_background"
         android:text="@string/widget_bt_not_connected"
         android:textSize="14sp"
-        android:textColor="#e2e2e2"/>
+        android:textColor="@color/widget_sub_text"/>
 
 
     <ImageButton
         android:id="@+id/widget_bt_connected_state_icon"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#60000000"
+        android:background="@color/widget_trans_background"
         android:layout_weight="1"
         android:adjustViewBounds="true"
         android:scaleType="centerInside"

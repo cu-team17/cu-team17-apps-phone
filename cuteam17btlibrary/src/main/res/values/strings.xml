@@ -13,6 +13,8 @@
     <string name="widget_bt_not_connected">No connection</string>
     <string name="widget_bt_disconnected">Disconnected</string>
     <string name="widget_bt_failed_to_connect">Failed to connect</string>
+    <string name="widget_bt_no_paired_device">No paired device</string>
+    <string name="widget_bt_no_bluetooth">Bluetooth not enabled</string>
     <string name="widget_bt_connecting">Connecting&#8230;</string>
     <string name="widget_bt_disconnecting">Disconnecting&#8230;</string>
 

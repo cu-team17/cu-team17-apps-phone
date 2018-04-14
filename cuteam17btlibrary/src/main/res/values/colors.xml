@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#464e51</color>
+    <color name="colorPrimaryDark">#2a2b2e</color>
+    <color name="colorAccent">#9c2249</color>
+
+    <color name="bt_blue">#ff2b64b4</color>
+
+    <color name="widget_title">#ffffff</color>
+    <color name="widget_sub_text">#e2e2e2</color>
+    <color name="widget_sub_text_error">#ed4015</color>
+    <color name="widget_trans_background">#60000000</color>
+
+</resources>

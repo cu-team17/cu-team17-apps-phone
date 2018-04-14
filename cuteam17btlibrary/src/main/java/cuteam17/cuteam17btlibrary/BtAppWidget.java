@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.widget.RemoteViews;
 
 import java.util.concurrent.Executors;
@@ -66,38 +67,54 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 		String intentAction = intent.getAction();
 		if (intentAction == null) return;
 
-		if (intentAction.equals(BT_CONNECTED_STATE_ICON_CLICK)) {
-			//ToDo: set timer between allowed touches so user can't spam start/stop
-			if (btConnected) {
-				stopBt(context);
-				setViewsContent(context, true, context.getResources().getString(R.string.widget_bt_disconnecting));
-			} else {
-				//ToDo: check if bluetooth is enabled
-				startBt(context);
-				setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_connecting));
-			}
-			createScheduledReset(context);
-
-		} else if (intentAction.equals(SETTINGS_BUTTON_CLICK)) {
-			startMainActivity(context);
-
-		} else if (intentAction.equals(BT_UPDATE)) {
-			Bundle bundle = intent.getExtras();
-			if (bundle != null) {
-				String state = bundle.getString(EXTRA_STATE, "");
-				if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_SUCCESS)) {
-					btConnected = true;
-					setViewsContent(context, true, context.getResources().getString(R.string.widget_bt_connected));
-				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_FAIL)) {
-					btConnected = false;
-					setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_failed_to_connect), Color.parseColor("#ED4015"));
-					createScheduledReset(context);
-				} else if (state.equals(BtTransferService.STATE_UPDATE_CONNECTION_DISCONNECTED)) {
-					btConnected = false;
-					setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_disconnected));
-					createScheduledReset(context);
+		switch (intentAction) {
+			case BT_CONNECTED_STATE_ICON_CLICK:
+				//ToDo: set timer between allowed touches so user can't spam start/stop
+				if (btConnected) {
+					stopBt(context);
+					setViewsContent(context, true, context.getResources().getString(R.string.widget_bt_disconnecting));
+				} else {
+					//ToDo: check if bluetooth is enabled
+					startBt(context);
+					setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_connecting));
 				}
-			}
+				//createScheduledReset(context);
+				break;
+			case SETTINGS_BUTTON_CLICK:
+				startMainActivity(context);
+				break;
+			case BT_UPDATE:
+				Bundle bundle = intent.getExtras();
+				if (bundle != null) {
+					String state = bundle.getString(EXTRA_STATE, "");
+					switch (state) {
+						case BtTransferService.STATE_UPDATE_CONNECTION_SUCCESS:
+							btConnected = true;
+							setViewsContent(context, true, context.getResources().getString(R.string.widget_bt_connected));
+							break;
+						case BtTransferService.STATE_UPDATE_CONNECTION_FAIL:
+							btConnected = false;
+							setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_failed_to_connect), ContextCompat.getColor(context, R.color.widget_sub_text_error));
+							createScheduledReset(context);
+							break;
+						case BtTransferService.STATE_UPDATE_CONNECTION_DISCONNECTED:
+							btConnected = false;
+							setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_disconnected));
+							createScheduledReset(context);
+							break;
+						case BtTransferService.STATE_UPDATE_NO_BLUETOOTH:
+							btConnected = false;
+							setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_no_bluetooth));
+							createScheduledReset(context);
+							break;
+						case BtTransferService.STATE_UPDATE_NO_PAIRED_DEVICE:
+							btConnected = false;
+							setViewsContent(context, false, context.getResources().getString(R.string.widget_bt_no_paired_device));
+							createScheduledReset(context);
+							break;
+					}
+				}
+				break;
 		}
 	}
 
@@ -114,7 +131,7 @@ public abstract class BtAppWidget extends AppWidgetProvider {
 	}
 
 	private void setViewsContent(Context context, boolean isConnected, String connectedStateText) {
-		setViewsContent(context, isConnected, connectedStateText, Color.parseColor("#E2E2E2"));
+		setViewsContent(context, isConnected, connectedStateText, ContextCompat.getColor(context, R.color.widget_sub_text));
 
 	}
 

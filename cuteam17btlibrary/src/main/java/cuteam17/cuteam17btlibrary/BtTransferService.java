@@ -75,6 +75,8 @@ public class BtTransferService extends Service {
 	public static final String STATE_UPDATE_CONNECTION_SUCCESS = "cuteam17btlibrary.bt_connection_success";
 	public static final String STATE_UPDATE_CONNECTION_FAIL = "cuteam17btlibrary.bt_connection_fail";
 	public static final String STATE_UPDATE_CONNECTION_DISCONNECTED = "cuteam17btlibrary.bt_connection_disconnected";
+	public static final String STATE_UPDATE_NO_BLUETOOTH = "cuteam17btlibrary.bt_no_bluetooth";
+	public static final String STATE_UPDATE_NO_PAIRED_DEVICE = "cuteam17btlibrary.bt_no_paired_device";
 
 	private static final int HEADER_SIZE = 1;
 	private static final char EOT = 4;
@@ -138,7 +140,10 @@ public class BtTransferService extends Service {
 
 	// start AcceptThread to begin a session in listening (server) mode.
 	public synchronized void start() {
-		if (!mAdapter.isEnabled()) return;
+		if (!mAdapter.isEnabled()) {
+			stateUpdate(STATE_UPDATE_NO_BLUETOOTH);
+			return;
+		}
 
 		if (mConnectThread != null) {
 			mConnectThread.cancel();
@@ -157,21 +162,28 @@ public class BtTransferService extends Service {
 	}
 
 	public void connectByPref() {
-		if (!mAdapter.isEnabled()) return;
+		if (!mAdapter.isEnabled()) {
+			stateUpdate(STATE_UPDATE_NO_BLUETOOTH);
+			return;
+		}
 
+		//ToDo: move connected device pref to a more safe method, in terms of supplying the string tag everywhere
 		SharedPreferences prefs = this.getSharedPreferences("cuteam17.phone", Context.MODE_PRIVATE);
 		String btDeviceAdr = prefs.getString("BT_Connected_Device", null);
 		if (btDeviceAdr != null) {
 			BluetoothDevice device = mAdapter.getRemoteDevice(btDeviceAdr);
 			connect(device);
 		} else {
-			//ToDo: stateUpdate, no paired device
+			stateUpdate(STATE_UPDATE_NO_PAIRED_DEVICE);
 		}
 	}
 
 	// Start the ConnectThread to initiate a connection to a remote device.
 	public synchronized void connect(BluetoothDevice device) {
-		if (!mAdapter.isEnabled()) return;
+		if (!mAdapter.isEnabled()) {
+			stateUpdate(STATE_UPDATE_NO_BLUETOOTH);
+			return;
+		}
 
 		if (mState == STATE_CONNECTING) {
 			if (mConnectThread != null) {
