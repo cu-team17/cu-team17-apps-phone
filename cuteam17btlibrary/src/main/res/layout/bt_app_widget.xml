@@ -19,7 +19,8 @@
             android:layout_marginStart="8dp"
             android:text="@string/widget_title"
             android:textSize="20sp"
-            android:textColor="@color/widget_title"/>
+            android:textColor="@color/widget_title"
+            android:singleLine="true" />
 
         <ImageButton
             android:id="@+id/widget_settings_button"
@@ -46,7 +47,20 @@
         android:background="@color/widget_trans_background"
         android:text="@string/widget_bt_not_connected"
         android:textSize="14sp"
-        android:textColor="@color/widget_sub_text"/>
+        android:textColor="@color/widget_sub_text"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:duplicateParentState="true">
+
+        <requestFocus
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:duplicateParentState="true"/>
+    </TextView>
 
 
     <ImageButton

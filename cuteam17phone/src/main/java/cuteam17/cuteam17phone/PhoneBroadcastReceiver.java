@@ -106,34 +106,33 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver {
 	}
 
 	// Determines and updates the system based on telephone state changes
-	private void updateTelephoneState(int state, String phoneNumber) {
+	private synchronized void updateTelephoneState(int state, String phoneNumber) {
 		//ToDo: check phoneNumber and multiple simultaneous calls
 		if (prevTelephoneState == state) return;
 		switch (state) {
+			// A new call arrived and is ringing or waiting. In the latter case, another call is already active.
 			case TelephonyManager.CALL_STATE_RINGING:
 				// Incoming call
 				startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber, getContactName(phoneNumber)));
-				Log.d("Phone", "incoming");
 				break;
 
+			// At least one call exists that is dialing, active, or on hold, and no calls are ringing or waiting
 			case TelephonyManager.CALL_STATE_OFFHOOK:
 				if (prevTelephoneState == TelephonyManager.CALL_STATE_RINGING) {
 					// Incoming call answered
 					startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber, getContactName(phoneNumber)));
-					Log.d("Phone", "incoming answered");
 				} else {
-					Log.d("Phone", "outgoing");
 					// Outgoing call
 				}
 				break;
+
+			// No activity
 			case TelephonyManager.CALL_STATE_IDLE:
 				if (prevTelephoneState == TelephonyManager.CALL_STATE_RINGING) {
 					// Incoming call missed
 					startTransferServiceWithExtra(new TelephoneTransferItem(state, phoneNumber, getContactName(phoneNumber)));
-					Log.d("Phone", "incoming missed");
 				} else {
 					// Incoming or Outgoing call ended
-					Log.d("Phone", "ended");
 				}
 				break;
 		}
