@@ -21,6 +21,7 @@ import cuteam17.cuteam17btlibrary.BtTransferItems.NotificationTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.SMSTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TelephoneTransferItem;
 import cuteam17.cuteam17btlibrary.BtTransferItems.TransferItemType;
+import cuteam17.cuteam17rpi.Overlays.NotificationsOverlayService;
 import cuteam17.cuteam17rpi.Overlays.OverlayActivity;
 import cuteam17.cuteam17rpi.Overlays.OverlayService;
 import cuteam17.cuteam17rpi.Overlays.SMSOverlayService;
@@ -30,6 +31,8 @@ import cuteam17.cuteam17rpi.Overlays.TelephoneOverlayService;
 public class RpiBtHandler extends Handler {
 
 	private Context mContext;
+
+	private boolean temp = false;
 
 	public RpiBtHandler(Context context, Looper looper) {
 		super(looper);
@@ -97,9 +100,12 @@ public class RpiBtHandler extends Handler {
 	}
 
 	private void handleNotification(Message msg) {
-		NotificationTransferItem item = deserializeMessageObject(msg, NotificationTransferItem.class);
-		if (item != null) {
-			Log.d("Really this worked", item.getPackageName());
+		if (!temp) {
+			NotificationTransferItem item = deserializeMessageObject(msg, NotificationTransferItem.class);
+			if (item != null) {
+				startOverlayActivity(item, NotificationsOverlayService.class);
+			}
+			temp = true;
 		}
 
 	}

@@ -2,4 +2,6 @@
     <string name="app_name">CU Team17 RPI</string>
 
     <string name="bt_setup">Setup Bluetooth</string>
+
+    <string name="bullet_space"> &#8226; </string>
 </resources>

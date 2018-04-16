@@ -47,6 +47,10 @@
             android:exported="false" />
 
         <service
+            android:name="cuteam17.cuteam17rpi.Overlays.NotificationsOverlayService"
+            android:exported="false" />
+
+        <service
             android:name=".RpiBtTransferService"/>
     </application>
 
