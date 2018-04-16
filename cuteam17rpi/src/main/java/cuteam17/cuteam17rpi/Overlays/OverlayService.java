@@ -25,7 +25,7 @@ public abstract class OverlayService extends Service {
 
 	public void onDestroy() {
 		super.onDestroy();
-		removeOverlayView();
+		removeOverlayView(false);
 	}
 
 	@Override
@@ -38,6 +38,10 @@ public abstract class OverlayService extends Service {
 	}
 
 	protected void addOverlayView(View overlayView, int scheduledRemovalDelay) {
+		//ToDo: remove previous overlay before adding a new one
+		if (this.overlayView != null) {
+			removeOverlayView(false);
+		}
 		this.overlayView = overlayView;
 
 		int overlayParam = (Build.VERSION.SDK_INT >= 26) ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
@@ -59,7 +63,7 @@ public abstract class OverlayService extends Service {
 	}
 
 	//ToDo: overlays are not always removed correctly
-	protected void removeOverlayView() {
+	protected void removeOverlayView(boolean stop) {
 		cancelScheduledRemoval();
 
 		if (overlayView != null) {
@@ -71,7 +75,7 @@ public abstract class OverlayService extends Service {
 		}
 
 		//ToDo: make sure the service is stopped because it is no longer needed
-		stopSelf();
+		if (stop) stopSelf();
 	}
 
 	protected BtTransferItem getBtTransferItem(Intent intent) {
@@ -89,7 +93,7 @@ public abstract class OverlayService extends Service {
 		scheduledRemoval = scheduler.schedule(
 				new Runnable() {
 					public void run() {
-						removeOverlayView();
+						removeOverlayView(true);
 					}
 				}, delay, TimeUnit.SECONDS);
 	}

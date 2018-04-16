@@ -21,6 +21,7 @@ public class NotificationsOverlayService extends OverlayService {
 
 	private View overlayView;
 
+	//ToDo: append new notifications to the linearlayout if there is already a notification being overlayed. That way you can view multiple notifications at once
 	private BroadcastReceiver notificationsUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -33,8 +34,10 @@ public class NotificationsOverlayService extends OverlayService {
 					LinearLayout list = overlayView.findViewById(R.id.notifications_list);
 					list.addView(createNotificationView(item));
 				}
-
+				cancelScheduledRemoval();
+				createScheduledRemoval(10);
 			}
+
 		}
 	};
 
@@ -79,7 +82,7 @@ public class NotificationsOverlayService extends OverlayService {
 				LinearLayout list = overlayView.findViewById(R.id.notifications_list);
 				list.addView(createNotificationView(item));
 
-				addOverlayView(overlayView, 20);
+				addOverlayView(overlayView, 10);
 			}
 		}
 		return START_NOT_STICKY;

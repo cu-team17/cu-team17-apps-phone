@@ -125,7 +125,7 @@ public class BtTransferService extends Service {
 		}
 
 		//ToDo: probably no longer need to return start sticky with new widget to start/stop bluetooth
-		return START_STICKY;
+		return START_NOT_STICKY;
 	}
 
 	@Override

@@ -100,12 +100,10 @@ public class RpiBtHandler extends Handler {
 	}
 
 	private void handleNotification(Message msg) {
-		if (!temp) {
-			NotificationTransferItem item = deserializeMessageObject(msg, NotificationTransferItem.class);
-			if (item != null) {
-				startOverlayActivity(item, NotificationsOverlayService.class);
-			}
-			temp = true;
+		NotificationTransferItem item = deserializeMessageObject(msg, NotificationTransferItem.class);
+		if (item != null) {
+			//ToDo: utilize NotificationTransferItem broadcasts to update current notifications rather than starting a new service if there is already a notification being overlaid
+			startOverlayActivity(item, NotificationsOverlayService.class);
 		}
 
 	}
