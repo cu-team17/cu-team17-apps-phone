@@ -111,54 +111,9 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	//ToDo: remove just for testing
-	public void startBT(View view) {
+	public void startBTAccept() {
 		Intent intent = new Intent(this, PhoneBtTransferService.class);
 		intent.setAction(PhoneBtTransferService.BT_START);
-		startService(intent);
-
-	}
-
-	//ToDo: remove just for testing
-	public void connectBT(View view) {
-		//Intent intent = new Intent(this, PhoneBtTransferService.class);
-		//intent.setAction(BtTransferService.BT_CONNECT);
-		//startService(intent);
-		TelephoneTransferItem msg = new TelephoneTransferItem(TelephonyManager.CALL_STATE_IDLE, "3038680303", "Jackson");
-
-		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(PhoneBtTransferService.BT_WRITE);
-		Bundle bundle = new Bundle();
-		bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, msg);
-		intent.putExtras(bundle);
-		startService(intent);
-	}
-
-	//ToDo: remove just for testing
-	public void stopBT(View view) {
-		//Intent intent = new Intent(this, PhoneBtTransferService.class);
-		//intent.setAction(PhoneBtTransferService.BT_STOP);
-		//startService(intent);
-
-		TelephoneTransferItem msg = new TelephoneTransferItem(TelephonyManager.CALL_STATE_RINGING, "3038680303", "Jackson");
-
-		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(PhoneBtTransferService.BT_WRITE);
-		Bundle bundle = new Bundle();
-		bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, msg);
-		intent.putExtras(bundle);
-		startService(intent);
-	}
-
-	//ToDo: remove, just for testing
-	public void writeBT(View view) {
-		SMSTransferItem msg = new SMSTransferItem("connected", null);
-
-		Intent intent = new Intent(this, PhoneBtTransferService.class);
-		intent.setAction(PhoneBtTransferService.BT_WRITE);
-		Bundle bundle = new Bundle();
-		bundle.putSerializable(PhoneBtTransferService.INTENT_EXTRA_WRITE, msg);
-		intent.putExtras(bundle);
 		startService(intent);
 	}
 
@@ -173,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 						editor.putString("BT_Connected_Device", btDeviceAdr);
 						editor.apply();
 
-						startBT(null);
+						startBTAccept();
 					} catch (NullPointerException e) {
 						return;
 					}
