@@ -30,7 +30,7 @@ public class TelephoneOverlayService extends OverlayService {
 				TelephoneTransferItem item = (TelephoneTransferItem) getBtTransferItem(intent);
 				if (item != null) {
 					if (item.getTelephoneState() == TelephonyManager.CALL_STATE_OFFHOOK) {
-						removeOverlayView();
+						removeOverlayView(true);
 					} else if (item.getTelephoneState() == TelephonyManager.CALL_STATE_IDLE) {
 						TextView telephone_call_header = overlayView.findViewById(R.id.telephone_call_header);
 						//ToDO: set text and color from values

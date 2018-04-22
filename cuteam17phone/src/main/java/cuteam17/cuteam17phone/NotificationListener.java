@@ -55,9 +55,6 @@ public class NotificationListener extends NotificationListenerService {
 			//android.reduced.images
 			//android.picture
 
-
-
-
 			Intent btIntent = new Intent(this, PhoneBtTransferService.class);
 			btIntent.setAction(PhoneBtTransferService.BT_WRITE);
 			Bundle bundle = new Bundle();

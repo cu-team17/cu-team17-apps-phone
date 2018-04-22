@@ -99,4 +99,11 @@
         android:textColor="#ffffff"
         android:background="@drawable/bt_button"
         android:onClick="btDiscovery" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Warning: pairing is buggy and can cause bluetooth issues"
+        android:layout_above="@id/button_scan"/>
 </RelativeLayout>

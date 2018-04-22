@@ -124,7 +124,6 @@ public class BtTransferService extends Service {
 			}
 		}
 
-		//ToDo: probably no longer need to return start sticky with new widget to start/stop bluetooth
 		return START_NOT_STICKY;
 	}
 
@@ -286,6 +285,7 @@ public class BtTransferService extends Service {
 
 	}
 
+	//ToDo: figure out when/where to call stopSelf() in order to stop the service after disconnecting/lost connection
 	// Indicate that the connection was lost
 	protected void connectionRestart() {
 		mState = STATE_NONE;
@@ -533,7 +533,7 @@ public class BtTransferService extends Service {
 				outputStream.write((byte)EOT);
 
 				mmOutStream.write(outputStream.toByteArray());
-				//ToDo: make what into constant
+				//ToDo: handler write operation
 				//mHandler.obtainMessage(2, -1, -1, buffer).sendToTarget();
 			} catch (IOException e) {
 				Log.e(TAG+":Connected", "Exception during write");
