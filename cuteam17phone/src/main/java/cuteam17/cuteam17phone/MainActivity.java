@@ -128,7 +128,8 @@ public class MainActivity extends AppCompatActivity {
 						editor.putString("BT_Connected_Device", btDeviceAdr);
 						editor.apply();
 
-						startBTAccept();
+						//startBTAccept();
+						Toast.makeText(this, "Device Selected", Toast.LENGTH_SHORT).show();
 					} catch (NullPointerException e) {
 						return;
 					}

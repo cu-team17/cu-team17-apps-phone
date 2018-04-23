@@ -93,14 +93,15 @@ public class BtTransferService extends Service {
 
 	@Override
 	public void onDestroy() {
+
 		//ToDo: close all threads
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent == null || intent.getAction() == null) {
-			Log.d(TAG, "connection restart");
-			connectionRestart();
+			Log.d(TAG, "null start");
+			//connectionRestart();
 		} else {
 			switch (intent.getAction()) {
 				case BtTransferService.BT_START:
@@ -111,6 +112,7 @@ public class BtTransferService extends Service {
 					break;
 				case BtTransferService.BT_STOP:
 					stop();
+					stopSelf();
 					break;
 				case BtTransferService.BT_WRITE:
 					Bundle bundle = intent.getExtras();
@@ -331,6 +333,7 @@ public class BtTransferService extends Service {
 				} catch (IOException e) {
 					Log.e(TAG+":Accept", "accept() failed");
 					stateUpdate(STATE_UPDATE_CONNECTION_FAIL);
+					stopSelf();
 					break;
 				}
 
@@ -409,6 +412,7 @@ public class BtTransferService extends Service {
 				//connectFailed();
 				Log.e(TAG+":Connect", "connect() failed");
 				stateUpdate(STATE_UPDATE_CONNECTION_FAIL);
+				stopSelf();
 				return;
 			}
 
@@ -417,7 +421,7 @@ public class BtTransferService extends Service {
 				mConnectThread = null;
 			}
 
-			failedConnects = 0;
+			//failedConnects = 0;
 			connected(mmSocket, mmDevice);
 		}
 
@@ -518,7 +522,7 @@ public class BtTransferService extends Service {
 				} catch (IOException e) {
 					Log.e(TAG+":Connected", "Disconnected");
 					stateUpdate(STATE_UPDATE_CONNECTION_DISCONNECTED);
-					connectionRestart();
+					stopSelf();
 					break;
 				}
 			}
@@ -547,5 +551,6 @@ public class BtTransferService extends Service {
 				Log.e(TAG+":Connected", "close() of connected socket failed");
 			}
 		}
+
 	}
 }
